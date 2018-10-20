@@ -2,8 +2,9 @@ import React from 'react';
 import { render } from 'react-dom';
 
 import MapExample from "../src/MapExample";
+import MyHeatmap from "../src/MyHeatmap";
 
 render(
-  <MapExample />,
+  <MyHeatmap />,
   document.getElementById('app')
 );
