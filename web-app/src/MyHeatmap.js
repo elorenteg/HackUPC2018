@@ -6,6 +6,8 @@ import { addressPoints } from './data/realworld.10000.js';
 
 import { points, points2 } from "./data/data.js";
 
+import axios from 'axios'
+
 import "./app.css"
 
 class MyHeatmap extends React.Component {
@@ -19,7 +21,10 @@ class MyHeatmap extends React.Component {
       blur: 4,
       min: 0,
       max: 10,
-      center: [41.390744, 2.163583]
+      center: [41.390744, 2.163583],
+      selectedKPI: [],
+      loadedKPIs: [],
+      loadedData: []
     };
 
     // gradient of heatmap (value to color matching)
@@ -27,6 +32,8 @@ class MyHeatmap extends React.Component {
       0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
       0.6: '#FAF3A5', 0.8: '#F5D98B', 1.0: '#DE9A96'
     };
+
+    dataLoaded = [];
 
     
   
@@ -42,27 +49,35 @@ class MyHeatmap extends React.Component {
     }
 
     setPoints(kpi) {
-      if (kpi == "contenidors") {
+      const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) {
+        console.log("Data for " + kpi + " already requested");
+        const ind = this.state.loadedKPIs.indexOf(kpi);
+        const kpiData = this.state.loadedData[ind];
+
         this.setState({
-          points: points.points,
-          min: points.scale.min,
-          max: points.scale.max
+          points: kpiData.points,
+          min: kpiData.scale.min,
+          max: kpiData.scale.max,
+          selectedKPI: kpi
         });
       }
-      else if (kpi == "verds") {
-        this.setState({
-          points: points2.points,
-          min: points2.scale.min,
-          max: points2.scale.max
-        });
+      else  {
+        console.log("Request data for " + kpi);
+        this.requestData(kpi);
       }
-      else {
-        this.setState({
-          points: [],
-          min: 0,
-          max: 1
-        });
-      }
+    }
+
+    requestData(kpi) {
+      axios.get('https://api.github.com/users/maecapozzi')
+        .then(response => {
+          if (kpi == "contenidors") response = points;
+          else if (kpi == "verds") response = points2;
+          else response = [];
+          this.setState({loadedData: this.state.loadedData.concat([response])})
+          this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi])})
+          this.setPoints(kpi);
+        })
     }
   
     render() {
@@ -89,6 +104,9 @@ class MyHeatmap extends React.Component {
             />
           </Map>
 
+          <p>Selected KPI = {this.state.selectedKPI}</p>
+          <p>Loaded KPIs = {this.state.loadedKPIs}</p>
+
           <div>
             <input
               type="button"
@@ -100,12 +118,12 @@ class MyHeatmap extends React.Component {
               value="Espais verds"
               onClick={() => this.setPoints("verds")}
             />
+          </div>
             <input
               type="button"
-              value="Res"
-              onClick={() => this.setPoints()}
+              value="Call API"
+              onClick={() => this.callApi()}
             />
-          </div>
         </div>
       );
     }
