@@ -22,6 +22,7 @@ class MyHeatmap extends React.Component {
       min: 0,
       max: 10,
       center: [41.390744, 2.163583],
+      numClicksKPI: [],
       selectedKPI: [],
       loadedKPIs: [],
       loadedData: []
@@ -33,21 +34,6 @@ class MyHeatmap extends React.Component {
       0.6: '#FAF3A5', 0.8: '#F5D98B', 1.0: '#DE9A96'
     };
 
-    dataLoaded = [];
-
-    
-  
-    /**
-     * Toggle limiting the address points to test behavior with refocusing/zooming when data points change
-     */
-    toggleLimitedAddressPoints() {
-      if (this.state.limitAddressPoints) {
-        this.setState({ addressPoints: addressPoints.slice(500, 1000), limitAddressPoints: false });
-      } else {
-        this.setState({ addressPoints, limitAddressPoints: true });
-      }
-    }
-
     setPoints(kpi) {
       const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
       if (isLoadedKPI) {
@@ -55,11 +41,16 @@ class MyHeatmap extends React.Component {
         const ind = this.state.loadedKPIs.indexOf(kpi);
         const kpiData = this.state.loadedData[ind];
 
+        const numClicksKPI = this.state.numClicksKPI;
+        numClicksKPI[ind] = (numClicksKPI[ind] + 1)%2;
+        const numClicks = numClicksKPI[ind];
+        
         this.setState({
           points: kpiData.points,
           min: kpiData.scale.min,
           max: kpiData.scale.max,
-          selectedKPI: kpi
+          selectedKPI: kpi,
+          numClicksKPI: numClicksKPI
         });
       }
       else  {
@@ -75,7 +66,7 @@ class MyHeatmap extends React.Component {
           else if (kpi == "verds") response = points2;
           else response = [];
           this.setState({loadedData: this.state.loadedData.concat([response])})
-          this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi])})
+          this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi]), numClicksKPI: this.state.numClicksKPI.concat([0])})
           this.setPoints(kpi);
         })
     }
@@ -119,11 +110,6 @@ class MyHeatmap extends React.Component {
               onClick={() => this.setPoints("verds")}
             />
           </div>
-            <input
-              type="button"
-              value="Call API"
-              onClick={() => this.callApi()}
-            />
         </div>
       );
     }
