@@ -17,6 +17,9 @@ import "./app.css"
 class MyHeatmap extends React.Component {
 
     map = null;
+    
+    ACTIVE_COLOR = "red";
+    INACTIVE_COLOR = "blue";
 
     // map properties
     state = {
@@ -29,12 +32,16 @@ class MyHeatmap extends React.Component {
       min: 0,
       max: 10,
       center: [41.390744, 2.163583],
-      selectedKPI: [],
-      loadedKPIs: [],
-      loadedData: [],
-      checked: [0]
+      checked: [0],
+      colors: {contaminacio: this.INACTIVE_COLOR, verds: this.INACTIVE_COLOR, contenidors: this.INACTIVE_COLOR}
     };
 
+    punctuation = {
+      contenidors: 4,
+      verds: 8,
+      contaminacio: -5
+    }
+    selectedKPIs = [];
     loadedKPIs = [];
     loadedData = [];
     numClicksKPI = [];
@@ -59,7 +66,7 @@ class MyHeatmap extends React.Component {
       this.setState({
         checked: newChecked,
       });
-    };
+    }
 
     setPoints(kpi) {
       const isLoadedKPI = this.loadedKPIs.includes(kpi);
@@ -67,27 +74,42 @@ class MyHeatmap extends React.Component {
         console.log("Data for " + kpi + " already requested");
         const ind = this.loadedKPIs.indexOf(kpi);
         const kpiData = this.loadedData[ind];
-
+        
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
         const numClicks = this.numClicksKPI[ind];
-        console.log(numClicks);
+        var colors = this.state.colors;
+        if (numClicks == 1) colors[kpi] = this.ACTIVE_COLOR;
+        else colors[kpi] = this.INACTIVE_COLOR;
+        this.setState({ colors: colors });
 
-        if (numClicks == 0) {
+        var numSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
+        console.log(numSelected);
+        if (numSelected == 0) {
           this.setState({
             points: []
           });
+          this.selectedKPIs.splice(ind, 1);
         }
-        else {
+        else if (numSelected == 1) {
           this.setState({
             points: kpiData.points,
             min: kpiData.scale.min,
-            max: kpiData.scale.max,
-            selectedKPI: kpi
+            max: kpiData.scale.max
+          });
+          this.selectedKPIs.concat([kpi]);
+        }
+        else {
+          console.log(this.selectedKPIs);
+          this.setState({
+            points: []
           });
         }
       }
       else  {
         console.log("Request data for " + kpi);
+        var colors = this.state.colors;
+        colors[kpi] = this.ACTIVE_COLOR;
+        this.setState({ colors: colors });
         this.requestData(kpi);
       }
     }
@@ -100,32 +122,27 @@ class MyHeatmap extends React.Component {
           "httpMethod":"GET",
           "queryStringParameters":{}
         }
-        })
-        .then(function (response) {
-          var data = response.data.body.Items[0];
-          for (var i = 0; i < data.values.length; ++i) {
-            data.values[i].longitude = data.values[i].longitude.replace(",",".");
-            data.values[i].latitude = data.values[i].latitude.replace(",",".");
-            data.values[i].value = data.values[i].value*1000;
+      })
+      .then(function (response) {
+        var data = response.data.body.Items[0];
+        for (var i = 0; i < data.values.length; ++i) {
+          data.values[i].longitude = data.values[i].longitude.replace(",",".");
+          data.values[i].latitude = data.values[i].latitude.replace(",",".");
+          data.values[i].value = data.values[i].value*1000;
+        }
+        //var rang = data.range.replace("[","").replace("]","").split(",");
+        var newData = {
+          points: data.values,
+          scale: {
+            min: parseFloat(data.range.min),
+            max: parseFloat(data.range.max)
           }
-          var rang = data.range.split("-");
-          var newData = {
-            points: data.values,
-            scale: {
-              min: rang[0],
-              max: rang[1]
-            }
-          };
-          console.log(newData);
-          this.loadedData = this.loadedData.concat([newData]);
-          this.loadedKPIs = this.loadedKPIs.concat([kpi]);
-          this.numClicksKPI = this.numClicksKPI.concat([0]);
-          this.setPoints(kpi);
-        })
-        .catch(function (response) {
-            //handle error
-            console.log("ERROR");
-        });
+        };
+        this.loadedData = this.loadedData.concat([newData]);
+        this.loadedKPIs = this.loadedKPIs.concat([kpi]);
+        this.numClicksKPI = this.numClicksKPI.concat([0]);
+        this.setPoints(kpi);
+      }.bind(this));
     }
 
     handleZoomEnd = () => {
@@ -158,24 +175,24 @@ class MyHeatmap extends React.Component {
                   </Typography>
                 
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("contaminacio")}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["contaminacio"]}} onClick={() => this.setPoints("contaminacio")}>
                       Pollution
                     </Button>
                     <Slider value={10} aria-labelledby="label"/>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("contenidors")}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["contenidors"]}} onClick={() => this.setPoints("contenidors")}>
                       Containers
                     </Button>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("verds")}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["verds"]}} onClick={() => this.setPoints("verds")}>
                       Green Areas
                     </Button>
                   </div>
                 </Paper>
               </div>
-              <p>Selected KPI = {this.state.selectedKPI}</p>
+              <p>Selected KPI = {this.selectedKPIs}</p>
               <p>Loaded KPIs = {this.loadedKPIs}</p>
             </Col>
             <Col xs={6} sm={6} md={8} lg={9}>
