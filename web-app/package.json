@@ -73,6 +73,7 @@
     "lodash.min": "^4.0.0",
     "lodash.pluck": "^3.1.2",
     "lodash.reduce": "^4.3.0",
+    "react-flexbox-grid": "^2.1.2",
     "simpleheat": "^0.4.0",
     "style-loader": "^0.23.1"
   }
