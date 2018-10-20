@@ -24,8 +24,16 @@ Same URL as the endpoint. Do a POST call with this values in the body as raw:
   "queryStringParameters": {},
   "body": {
     "Item": {
-      "ID": "An unique ID",
-      "value": "A value"
+      "data_types": "1",
+      "values": [
+        {
+            "latitude": "41,2448",
+            "value": 0,
+            "longitude": "1,6177"
+        }
+      ],
+      "data_type": "Air Quality - PM10",
+      "range": "0-100"
     }
   }
 }
