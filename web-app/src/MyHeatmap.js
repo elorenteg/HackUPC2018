@@ -18,8 +18,19 @@ class MyHeatmap extends React.Component {
 
     map = null;
     
-    ACTIVE_COLOR = "red";
-    INACTIVE_COLOR = "blue";
+    ACTIVE_COLOR = "#3D5AFE";
+    INACTIVE_COLOR = "#283593";
+
+    OPTIONS = {
+      OP1: "Air Quality - O3",
+      OP2: "Air Quality - NO2",
+      OP3: "Air Quality - PM10"
+    }
+    OPTIONS_POINTS = {
+      OP1: -10,
+      OP2: -10,
+      OP3: -10
+    }
 
     // map properties
     state = {
@@ -35,12 +46,6 @@ class MyHeatmap extends React.Component {
       checked: [0],
       colors: {contaminacio: this.INACTIVE_COLOR, verds: this.INACTIVE_COLOR, contenidors: this.INACTIVE_COLOR}
     };
-
-    punctuation = {
-      contenidors: 4,
-      verds: 8,
-      contaminacio: -5
-    }
     selectedKPIs = [];
     loadedKPIs = [];
     loadedData = [];
@@ -71,9 +76,10 @@ class MyHeatmap extends React.Component {
     setPoints(kpi) {
       const isLoadedKPI = this.loadedKPIs.includes(kpi);
       if (isLoadedKPI) {
-        console.log("Data for " + kpi + " already requested");
+        //console.log("Data for " + kpi + " already requested");
         const ind = this.loadedKPIs.indexOf(kpi);
         const kpiData = this.loadedData[ind];
+        console.log(kpiData);
         
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
         const numClicks = this.numClicksKPI[ind];
@@ -83,7 +89,6 @@ class MyHeatmap extends React.Component {
         this.setState({ colors: colors });
 
         var numSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
-        console.log(numSelected);
         if (numSelected == 0) {
           this.setState({
             points: []
@@ -99,14 +104,14 @@ class MyHeatmap extends React.Component {
           this.selectedKPIs.concat([kpi]);
         }
         else {
-          console.log(this.selectedKPIs);
+          // aggregate results by punctuation
           this.setState({
             points: []
           });
         }
       }
       else  {
-        console.log("Request data for " + kpi);
+        //console.log("Request data for " + kpi);
         var colors = this.state.colors;
         colors[kpi] = this.ACTIVE_COLOR;
         this.setState({ colors: colors });
@@ -124,24 +129,31 @@ class MyHeatmap extends React.Component {
         }
       })
       .then(function (response) {
-        var data = response.data.body.Items[0];
-        for (var i = 0; i < data.values.length; ++i) {
-          data.values[i].longitude = data.values[i].longitude.replace(",",".");
-          data.values[i].latitude = data.values[i].latitude.replace(",",".");
-          data.values[i].value = data.values[i].value*1000;
-        }
-        //var rang = data.range.replace("[","").replace("]","").split(",");
-        var newData = {
-          points: data.values,
-          scale: {
-            min: parseFloat(data.range.min),
-            max: parseFloat(data.range.max)
+        var data = null;
+        if (kpi === this.OPTIONS.OP1) data = response.data.body.Items[0];
+        else if (kpi === this.OPTIONS.OP2) data = response.data.body.Items[1];
+        else if (kpi === this.OPTIONS.OP3) data = response.data.body.Items[2];
+        if (data !== null) {
+          for (var i = 0; i < data.values.length; ++i) {
+            data.values[i].longitude = data.values[i].longitude.replace(",",".");
+            data.values[i].latitude = data.values[i].latitude.replace(",",".");
+            data.values[i].value = data.values[i].value*200;
           }
-        };
-        this.loadedData = this.loadedData.concat([newData]);
-        this.loadedKPIs = this.loadedKPIs.concat([kpi]);
-        this.numClicksKPI = this.numClicksKPI.concat([0]);
-        this.setPoints(kpi);
+          var newData = {
+            points: data.values,
+            scale: {
+              min: parseFloat(data.range.min),
+              max: parseFloat(data.range.max)
+            }
+          };
+          this.loadedData = this.loadedData.concat([newData]);
+          this.loadedKPIs = this.loadedKPIs.concat([kpi]);
+          this.numClicksKPI = this.numClicksKPI.concat([0]);
+          this.setPoints(kpi);
+        }
+        else {
+          console.log("ERROR");
+        }
       }.bind(this));
     }
 
@@ -151,14 +163,14 @@ class MyHeatmap extends React.Component {
 
     getRadius() {
       var currentZoom = this.state.zoom;
-      var radius = this.state.radius * Math.pow(2, currentZoom - 12);
+      var radius = this.state.radius * Math.pow(2, currentZoom - 12)*2;
       //console.log("R - " + currentZoom + " ---- " + radius);
       return (radius);
     }
 
     getBlur() {
       var currentZoom = this.state.zoom;
-      var blur = this.state.blur * Math.pow(2, currentZoom - 12);
+      var blur = this.state.blur * Math.pow(2, currentZoom - 12)*3;
       //console.log("Z - " + currentZoom + " ---- " + blur);
       return (blur);
     }
@@ -175,19 +187,21 @@ class MyHeatmap extends React.Component {
                   </Typography>
                 
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["contaminacio"]}} onClick={() => this.setPoints("contaminacio")}>
-                      Pollution
-                    </Button>
-                    <Slider value={10} aria-labelledby="label"/>
-                  </div>
-                  <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["contenidors"]}} onClick={() => this.setPoints("contenidors")}>
-                      Containers
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP1]}} 
+                      onClick={() => this.setPoints(this.OPTIONS.OP1)}>
+                      {this.OPTIONS.OP1}
                     </Button>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors["verds"]}} onClick={() => this.setPoints("verds")}>
-                      Green Areas
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP2]}}
+                      onClick={() => this.setPoints(this.OPTIONS.OP2)}>
+                      {this.OPTIONS.OP2}
+                    </Button>
+                  </div>
+                  <div style={{margin: "10px", width: "92%"}}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP3]}}
+                      onClick={() => this.setPoints(this.OPTIONS.OP3)}>
+                      {this.OPTIONS.OP3}
                     </Button>
                   </div>
                 </Paper>
