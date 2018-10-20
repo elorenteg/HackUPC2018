@@ -1,10 +1,12 @@
 import boto3
 import json
 
+from lambda_function_utils import DecimalEncoder
+
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
+        'body': err.message if err else json.dumps(res, cls=DecimalEncoder),
         'headers': {
             'Content-Type': 'application/json',
         },
@@ -33,6 +35,7 @@ def lambda_handler(event, context):
         dynamo = boto3.resource('dynamodb').Table('HackUPC2018')
     
         payload = event['queryStringParameters'] if operation == 'GET' else event['body']
+        
         return respond(None, operations[operation](dynamo, payload))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
