@@ -1,12 +1,10 @@
 import boto3
 import json
 
-from lambda_function_utils import DecimalEncoder
-
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res, cls=DecimalEncoder),
+        'body': err.message if err else res,
         'headers': {
             'Content-Type': 'application/json',
         },
