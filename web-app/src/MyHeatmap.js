@@ -4,7 +4,7 @@ import { Map, TileLayer } from 'react-leaflet';
 import HeatmapLayer from './HeatmapLayer';
 import { addressPoints } from './data/realworld.10000.js';
 
-import { points, points2 } from "./data/data.js";
+import { points, points2, points3 } from "./data/data.js";
 
 import axios from 'axios'
 
@@ -12,13 +12,16 @@ import "./app.css"
 
 class MyHeatmap extends React.Component {
 
+    map = null;
+
     // map properties
     state = {
       mapHidden: false,
       layerHidden: false,
       points: [],
+      zoom: 13,
       radius: 10,
-      blur: 4,
+      blur: 20,
       min: 0,
       max: 10,
       center: [41.390744, 2.163583],
@@ -36,6 +39,8 @@ class MyHeatmap extends React.Component {
 
     setPoints(kpi) {
       const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
+      console.log(isLoadedKPI);
+      if (this.map !== null) console.log(this.map.leafletElement.getZoom());
       if (isLoadedKPI) {
         console.log("Data for " + kpi + " already requested");
         const ind = this.state.loadedKPIs.indexOf(kpi);
@@ -44,7 +49,7 @@ class MyHeatmap extends React.Component {
         const numClicksKPI = this.state.numClicksKPI;
         numClicksKPI[ind] = (numClicksKPI[ind] + 1)%2;
         const numClicks = numClicksKPI[ind];
-        
+
         this.setState({
           points: kpiData.points,
           min: kpiData.scale.min,
@@ -52,6 +57,9 @@ class MyHeatmap extends React.Component {
           selectedKPI: kpi,
           numClicksKPI: numClicksKPI
         });
+        console.log(this.state.loadedKPIs);
+        const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
+        console.log(isLoadedKPI);
       }
       else  {
         console.log("Request data for " + kpi);
@@ -60,32 +68,67 @@ class MyHeatmap extends React.Component {
     }
 
     requestData(kpi) {
-      axios.get('https://api.github.com/users/maecapozzi')
+      /*
+      axios.get('https://correuv2.upc.edu/SOGo/')
         .then(response => {
-          if (kpi == "contenidors") response = points;
-          else if (kpi == "verds") response = points2;
-          else response = [];
-          this.setState({loadedData: this.state.loadedData.concat([response])})
-          this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi]), numClicksKPI: this.state.numClicksKPI.concat([0])})
-          this.setPoints(kpi);
+          
         })
+        */
+
+      const response = null;
+      if (kpi == "contenidors") response = points;
+      else if (kpi == "verds") response = points2;
+      else if (kpi == "contaminacio") {
+        response = points3;
+        for (var i = 0; i < response.points.length; ++i) {
+          response.points[i].longitude = response.points[i].longitude.replace(",",".");
+          response.points[i].latitude = response.points[i].latitude.replace(",",".");
+          response.points[i].value = response.points[i].value*1000;
+        }
+      }
+      else response = [];
+      this.setState({loadedData: this.state.loadedData.concat([response])});
+      this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi]), numClicksKPI: this.state.numClicksKPI.concat([0])});
+      //this.setPoints(kpi);
+      const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
+      console.log(isLoadedKPI);
+    }
+
+    handleZoomEnd = () => {
+      console.log("HEY");
+      this.setState({zoom: this.map.leafletElement.getZoom()});
+    }
+
+    getRadius() {
+      var currentZoom = this.state.zoom;
+      var radius = this.state.radius * Math.pow(2, currentZoom - 10);
+      console.log("R - " + currentZoom + " ---- " + radius);
+      return (radius);
+    }
+
+    getBlur() {
+      var currentZoom = this.state.zoom;
+      var blur = this.state.blur * Math.pow(2, currentZoom - 10);
+      console.log("Z - " + currentZoom + " ---- " + blur);
+      return (blur);
     }
   
     render() {
       return (
         <div>
-          <Map center={this.state.center} zoom={13}>
+          <Map center={this.state.center} zoom={this.state.zoom} ref={(ref) => { this.map = ref; }} onZoomEnd={this.handleZoomEnd}>
             {!this.state.layerHidden &&
                 <HeatmapLayer
-                  fitBoundsOnLoad
-                  fitBoundsOnUpdate
+                  //fitBoundsOnLoad
+                  //fitBoundsOnUpdate
                   points={this.state.points}
-                  longitudeExtractor={m => m.longitude}
-                  latitudeExtractor={m => m.latitude}
+                  longitudeExtractor={m => parseFloat(m.longitude)}
+                  latitudeExtractor={m => parseFloat(m.latitude)}
                   gradient={this.gradient}
                   intensityExtractor={m => parseFloat(m.value)}
-                  radius={Number(this.state.radius)}
-                  blur={Number(this.state.blur)}
+                  scaleRadius={this.state.scaleRadius}
+                  radius={this.getRadius()}
+                  blur={this.getBlur()}
                   max={Number.parseFloat(this.state.max)}
                 />
               }
@@ -108,6 +151,11 @@ class MyHeatmap extends React.Component {
               type="button"
               value="Espais verds"
               onClick={() => this.setPoints("verds")}
+            />
+            <input
+              type="button"
+              value="Contaminació"
+              onClick={() => this.setPoints("contaminacio")}
             />
           </div>
         </div>
