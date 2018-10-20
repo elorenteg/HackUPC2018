@@ -36,7 +36,7 @@ public class AWSManager {
     }
 
     static Map<String, Object> buildResponseBody(String data_type, Range range, List<Object> values) {
-        Map<String, Object> json2Return = new HashMap();
+        Map<String, Object> json2Return = new HashMap<>();
         Date date = new Date();
 
         json2Return.put("data_type", data_type);
