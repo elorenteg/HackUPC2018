@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.Map;
 
 @SpringBootApplication
@@ -21,7 +22,17 @@ public class CityAnalyzerApplication {
     }
 
     @GetMapping("/pm10")
-    private Map<String, Object> pm10() {
+    private Map<String, Object> pm10() throws ParseException {
         return AirQualityManager.getPm10Data();
+    }
+
+    @GetMapping("/no2")
+    private Map<String, Object> no2() throws ParseException {
+        return AirQualityManager.getNO2Data();
+    }
+
+    @GetMapping("/o3")
+    private Map<String, Object> o3() throws ParseException {
+        return AirQualityManager.getO3Data();
     }
 }

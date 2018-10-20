@@ -40,7 +40,7 @@ public class AWSManager {
         Date date = new Date();
 
         json2Return.put("data_type", data_type);
-        json2Return.put("range", range.toString());
+        json2Return.put("range", range.toMap());
         json2Return.put("last_update", dateFormat.format(date));
         json2Return.put("values", values);
 
