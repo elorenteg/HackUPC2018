@@ -7,6 +7,7 @@ import { points, points2, points3 } from "./data/data.js";
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
+import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 
 import axios from 'axios'
@@ -92,29 +93,39 @@ class MyHeatmap extends React.Component {
     }
 
     requestData(kpi) {
-      /*
-      axios.get('https://correuv2.upc.edu/SOGo/')
-        .then(response => {
-          
-        })
-        */
-
-      const response = null;
-      if (kpi == "contenidors") response = points;
-      else if (kpi == "verds") response = points2;
-      else if (kpi == "contaminacio") {
-        response = points3;
-        for (var i = 0; i < response.points.length; ++i) {
-          response.points[i].longitude = response.points[i].longitude.replace(",",".");
-          response.points[i].latitude = response.points[i].latitude.replace(",",".");
-          response.points[i].value = response.points[i].value*1000;
+      axios({
+        method: 'post',
+        url: 'https://cxi66ge4ng.execute-api.us-east-1.amazonaws.com/prod/',
+        data: {
+          "httpMethod":"GET",
+          "queryStringParameters":{}
         }
-      }
-      else response = [];
-      this.loadedData = this.loadedData.concat([response]);
-      this.loadedKPIs = this.loadedKPIs.concat([kpi]);
-      this.numClicksKPI = this.numClicksKPI.concat([0]);
-      this.setPoints(kpi);
+        })
+        .then(function (response) {
+          var data = response.data.body.Items[0];
+          for (var i = 0; i < data.values.length; ++i) {
+            data.values[i].longitude = data.values[i].longitude.replace(",",".");
+            data.values[i].latitude = data.values[i].latitude.replace(",",".");
+            data.values[i].value = data.values[i].value*1000;
+          }
+          var rang = data.range.split("-");
+          var newData = {
+            points: data.values,
+            scale: {
+              min: rang[0],
+              max: rang[1]
+            }
+          };
+          console.log(newData);
+          this.loadedData = this.loadedData.concat([newData]);
+          this.loadedKPIs = this.loadedKPIs.concat([kpi]);
+          this.numClicksKPI = this.numClicksKPI.concat([0]);
+          this.setPoints(kpi);
+        })
+        .catch(function (response) {
+            //handle error
+            console.log("ERROR");
+        });
     }
 
     handleZoomEnd = () => {
@@ -143,30 +154,26 @@ class MyHeatmap extends React.Component {
               <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
                 <Paper className="paper" id="block" elevation={1} style={{paddingBottom: "10px"}}>
                   <Typography variant="h5" component="h3">
-                    Options
+                    KPIs
                   </Typography>
-                  
-                  <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("contenidors")}>
-                      Contenidors
-                    </Button>
-                  </div>
-
-                  <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("verds")}>
-                      Espais verds
-                    </Button>
-                  </div>
+                
                   <div style={{margin: "10px", width: "92%"}}>
                     <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("contaminacio")}>
-                      Contaminació
+                      Pollution
+                    </Button>
+                    <Slider value={10} aria-labelledby="label"/>
+                  </div>
+                  <div style={{margin: "10px", width: "92%"}}>
+                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("contenidors")}>
+                      Containers
                     </Button>
                   </div>
-
+                  <div style={{margin: "10px", width: "92%"}}>
+                    <Button variant="contained" color="primary" id="block" onClick={() => this.setPoints("verds")}>
+                      Green Areas
+                    </Button>
+                  </div>
                 </Paper>
-
-
-                
               </div>
               <p>Selected KPI = {this.state.selectedKPI}</p>
               <p>Loaded KPIs = {this.loadedKPIs}</p>
