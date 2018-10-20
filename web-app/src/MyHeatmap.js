@@ -31,6 +31,9 @@ class MyHeatmap extends React.Component {
       loadedData: []
     };
 
+    loadedKPIs = [];
+    loadedData = [];
+
     // gradient of heatmap (value to color matching)
     gradient = {
       0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
@@ -38,13 +41,11 @@ class MyHeatmap extends React.Component {
     };
 
     setPoints(kpi) {
-      const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
-      console.log(isLoadedKPI);
-      if (this.map !== null) console.log(this.map.leafletElement.getZoom());
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
       if (isLoadedKPI) {
         console.log("Data for " + kpi + " already requested");
-        const ind = this.state.loadedKPIs.indexOf(kpi);
-        const kpiData = this.state.loadedData[ind];
+        const ind = this.loadedKPIs.indexOf(kpi);
+        const kpiData = this.loadedData[ind];
 
         const numClicksKPI = this.state.numClicksKPI;
         numClicksKPI[ind] = (numClicksKPI[ind] + 1)%2;
@@ -57,9 +58,6 @@ class MyHeatmap extends React.Component {
           selectedKPI: kpi,
           numClicksKPI: numClicksKPI
         });
-        console.log(this.state.loadedKPIs);
-        const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
-        console.log(isLoadedKPI);
       }
       else  {
         console.log("Request data for " + kpi);
@@ -87,28 +85,26 @@ class MyHeatmap extends React.Component {
         }
       }
       else response = [];
-      this.setState({loadedData: this.state.loadedData.concat([response])});
-      this.setState({loadedKPIs: this.state.loadedKPIs.concat([kpi]), numClicksKPI: this.state.numClicksKPI.concat([0])});
-      //this.setPoints(kpi);
-      const isLoadedKPI = this.state.loadedKPIs.includes(kpi);
-      console.log(isLoadedKPI);
+      this.loadedData = this.loadedData.concat([response]);
+      this.loadedKPIs = this.loadedKPIs.concat([kpi]);
+      //, numClicksKPI: this.state.numClicksKPI.concat([0])});
+      this.setPoints(kpi);
     }
 
     handleZoomEnd = () => {
-      console.log("HEY");
       this.setState({zoom: this.map.leafletElement.getZoom()});
     }
 
     getRadius() {
       var currentZoom = this.state.zoom;
-      var radius = this.state.radius * Math.pow(2, currentZoom - 10);
+      var radius = this.state.radius * Math.pow(2, currentZoom - 12);
       console.log("R - " + currentZoom + " ---- " + radius);
       return (radius);
     }
 
     getBlur() {
       var currentZoom = this.state.zoom;
-      var blur = this.state.blur * Math.pow(2, currentZoom - 10);
+      var blur = this.state.blur * Math.pow(2, currentZoom - 12);
       console.log("Z - " + currentZoom + " ---- " + blur);
       return (blur);
     }
@@ -116,7 +112,7 @@ class MyHeatmap extends React.Component {
     render() {
       return (
         <div>
-          <Map center={this.state.center} zoom={this.state.zoom} ref={(ref) => { this.map = ref; }} onZoomEnd={this.handleZoomEnd}>
+          <Map center={this.state.center} zoom={this.state.zoom} maxZoom={16} ref={(ref) => { this.map = ref; }} onZoomEnd={this.handleZoomEnd}>
             {!this.state.layerHidden &&
                 <HeatmapLayer
                   //fitBoundsOnLoad
