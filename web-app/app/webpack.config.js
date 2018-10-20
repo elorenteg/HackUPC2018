@@ -55,6 +55,10 @@ module.exports = {
     progress: true,
     stats: {
       cached: false
+    },
+    headers: { 
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
     }
   }
 };
