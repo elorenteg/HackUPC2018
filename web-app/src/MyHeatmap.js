@@ -18,7 +18,8 @@ class MyHeatmap extends React.Component {
       radius: 10,
       blur: 4,
       min: 0,
-      max: 10
+      max: 10,
+      center: [41.390744, 2.163583]
     };
 
     // gradient of heatmap (value to color matching)
@@ -45,21 +46,21 @@ class MyHeatmap extends React.Component {
         this.setState({
           points: points.points,
           min: points.scale.min,
-          max: points.scale.max/10
+          max: points.scale.max
         });
       }
       else if (kpi == "verds") {
         this.setState({
           points: points2.points,
           min: points2.scale.min,
-          max: points2.scale.max/10
+          max: points2.scale.max
         });
       }
       else {
         this.setState({
           points: [],
           min: 0,
-          max: 1/10
+          max: 1
         });
       }
     }
@@ -67,7 +68,7 @@ class MyHeatmap extends React.Component {
     render() {
       return (
         <div>
-          <Map center={[0, 0]} zoom={13}>
+          <Map center={this.state.center} zoom={13}>
             {!this.state.layerHidden &&
                 <HeatmapLayer
                   fitBoundsOnLoad
@@ -83,8 +84,8 @@ class MyHeatmap extends React.Component {
                 />
               }
             <TileLayer
-              url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
             />
           </Map>
 
