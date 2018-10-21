@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class TouristicHomesManager {
 
     public static void getDataFromSources() throws UnirestException, IOException {
         InputStream in = Unirest.get(OPEN_DATA_URL).asString().getRawBody();
+        DecimalFormat df = new DecimalFormat("##.####");
 
         Reader reader = new InputStreamReader(in);
         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
@@ -38,8 +40,8 @@ public class TouristicHomesManager {
             String latitude = csvRecord.get(16);
             if (!longitude.equals("LONGITUD_X")) {
                 Map<String, Object> sensor = new HashMap<>();
-                sensor.put("latitude", latitude);
-                sensor.put("longitude", longitude);
+                sensor.put("lat", df.format(Double.parseDouble(latitude)));
+                sensor.put("lon", df.format(Double.parseDouble(longitude)));
                 sensor.put("value", 0);
                 values.add(sensor);
             }

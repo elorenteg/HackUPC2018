@@ -42,8 +42,8 @@ public class AirQualityManager {
                 int kpiIntValue = (int) Math.round(number.doubleValue());
 
                 Map<String, Object> sensor = new HashMap<>();
-                sensor.put("latitude", latitude);
-                sensor.put("longitude", longitude);
+                sensor.put("lat", latitude);
+                sensor.put("lon", longitude);
                 sensor.put("value", kpiIntValue);
 
                 values.add(sensor);
