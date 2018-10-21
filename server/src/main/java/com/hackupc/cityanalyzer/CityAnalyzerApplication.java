@@ -35,4 +35,9 @@ public class CityAnalyzerApplication {
     private Map<String, Object> o3() throws ParseException {
         return AirQualityManager.getO3Data();
     }
+
+    @GetMapping("/touristic")
+    private Map<String, Object> touristic() {
+        return TouristicHomesManager.getTouristicHomesData();
+    }
 }

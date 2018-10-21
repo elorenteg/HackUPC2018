@@ -5,6 +5,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 @Component
@@ -16,5 +17,11 @@ public class ScheduledTasks {
         AWSManager.pushDataToDynamo(AirQualityManager.getPm10Data());
         AWSManager.pushDataToDynamo(AirQualityManager.getNO2Data());
         AWSManager.pushDataToDynamo(AirQualityManager.getO3Data());
+    }
+
+    @Scheduled(fixedRate = 86400000)
+    private void updateTouristicHomes() throws UnirestException, IOException {
+        TouristicHomesManager.getDataFromSources();
+        AWSManager.pushDataToDynamo(TouristicHomesManager.getTouristicHomesData());
     }
 }
