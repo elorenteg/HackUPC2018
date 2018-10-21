@@ -36,9 +36,9 @@ class MyHeatmap extends React.Component {
       OP4: -10
     }
     rows = [
-      {id: "O3",    punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
-      {id: "NO2",   punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
-      {id: "PM10",  punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
+      {id: "O3",        punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
+      {id: "NO2",       punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
+      {id: "PM10",      punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
       {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0}
     ];
 
@@ -56,6 +56,7 @@ class MyHeatmap extends React.Component {
       checked: [0],
       colors: {contaminacio: this.INACTIVE_COLOR, verds: this.INACTIVE_COLOR, contenidors: this.INACTIVE_COLOR}
     };
+    ponderationSelected = 1;
     selectedKPIs = [];
     loadedKPIs = [];
     loadedData = [];
@@ -63,8 +64,8 @@ class MyHeatmap extends React.Component {
 
     // gradient of heatmap (value to color matching)
     COLORS = {
-      RED: "#DE9A96",
-      ORANGE: "#F5D98B",
+      RED: "#C62828",
+      ORANGE: "#FF9800",
       YELLOW: "#FAF3A5",
       GREEN: "#82CEB6",
       LIGHT_BLUE: "#96E3E6",
@@ -109,6 +110,7 @@ class MyHeatmap extends React.Component {
         this.setState({ colors: colors });
 
         var numSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
+        this.ponderationSelected =  -1;
         if (numSelected == 0) {
           this.setState({
             points: []
@@ -119,10 +121,12 @@ class MyHeatmap extends React.Component {
         else if (numSelected == 1) {
           if (numClicks == 1) {
             this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
+            if (kpi === this.OPTIONS.OP4) this.ponderationSelected = 1;
           }
           else {
             const indaux = this.selectedKPIs.indexOf(kpi);
             this.selectedKPIs.splice(indaux, 1);
+            if (this.selectedKPIs[0] === this.OPTIONS.OP4) this.ponderationSelected = 1;
             ind = this.loadedKPIs.indexOf(this.selectedKPIs[0]);
             kpiData = this.loadedData[ind];
           }
@@ -182,7 +186,7 @@ class MyHeatmap extends React.Component {
             sum = sum + data.values[i].val;
             data.values[i].longitude = data.values[i].lon.replace(",",".");
             data.values[i].latitude = data.values[i].lat.replace(",",".");
-            if (kpi === this.OPTIONS.OP4) pond = 20;
+            if (kpi === this.OPTIONS.OP4) pond = 0.5;
             data.values[i].value = data.values[i].val*pond;
           }
           var ind = -1;
@@ -215,14 +219,18 @@ class MyHeatmap extends React.Component {
 
     getRadius() {
       var currentZoom = this.state.zoom;
-      var radius = this.state.radius * Math.pow(2, currentZoom - 12)*2;
+      var pond = 2;
+      if (this.ponderationSelected > 0) pond = 1;
+      var radius = this.state.radius * Math.pow(2, currentZoom - 12)*pond;
       //console.log("R - " + currentZoom + " ---- " + radius);
       return (radius);
     }
 
     getBlur() {
       var currentZoom = this.state.zoom;
-      var blur = this.state.blur * Math.pow(2, currentZoom - 12)*3;
+      var pond = 3;
+      if (this.ponderationSelected > 0) pond = 2;
+      var blur = this.state.blur * Math.pow(2, currentZoom - 12)*pond;
       //console.log("Z - " + currentZoom + " ---- " + blur);
       return (blur);
     }
