@@ -166,10 +166,10 @@ class MyHeatmap extends React.Component {
             var data = this.loadedData[ind];
 
             var punctuation = -1;
-            if (selected == this.OPTIONS.OP1) punctuation = this.OPTIONS_POINTS.OP1;
-            else if (selected == this.OPTIONS.OP2) punctuation = this.OPTIONS_POINTS.OP2;
-            else if (selected == this.OPTIONS.OP3) punctuation = this.OPTIONS_POINTS.OP3;
-            else if (selected == this.OPTIONS.OP4) punctuation = this.OPTIONS_POINTS.OP4;
+            if (selected == this.OPTIONS.OP1) punctuation = this.state.punctuation.OP1;
+            else if (selected == this.OPTIONS.OP2) punctuation = this.state.punctuation.OP2;
+            else if (selected == this.OPTIONS.OP3) punctuation = this.state.punctuation.OP3;
+            else if (selected == this.OPTIONS.OP4) punctuation = this.state.punctuation.OP4;
 
             var points = JSON.parse(JSON.stringify(data.points))
             var min = data.scale.min;
@@ -215,8 +215,6 @@ class MyHeatmap extends React.Component {
       this.setState({punctuation: points});
       this.rows[id].punctuation = Math.round(value);
     }
-
-    
 
     requestData(kpi) {
       axios({
