@@ -5,6 +5,7 @@ import HeatmapLayer from './HeatmapLayer';
 import { Row, Col } from 'react-flexbox-grid';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
+import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -17,9 +18,8 @@ import axios from 'axios'
 import "./app.css"
 
 class MyHeatmap extends React.Component {
-
     map = null;
-    
+
     ACTIVE_COLOR = "#3D5AFE";
     INACTIVE_COLOR = "#283593";
 
@@ -60,7 +60,11 @@ class MyHeatmap extends React.Component {
       max: 10,
       center: [41.390744, 2.163583],
       checked: [0],
-      colors: this.OPTIONS_COLORS
+      colors: this.OPTIONS_COLORS,
+      valueSlider1: 50,
+      valueSlider2: 50,
+      valueSlider3: 50,
+      valueSlider4: 50
     };
     ponderationSelected = 1;
     selectedKPIs = [];
@@ -120,7 +124,7 @@ class MyHeatmap extends React.Component {
         const ind = this.loadedKPIs.indexOf(kpi);
         const kpiData = this.loadedData[ind];
         //console.log(kpiData);
-        
+
         var previousSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
 
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
@@ -192,6 +196,12 @@ class MyHeatmap extends React.Component {
       if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(kpi)) gradient = this.GRADIENT_1_BAD;
       this.setState({gradient: gradient});
     }
+
+    setImportance(valueSlider, value) {
+      this.setState({
+        valueSlider: value
+      });
+    };
 
     requestData(kpi) {
       axios({
@@ -269,23 +279,31 @@ class MyHeatmap extends React.Component {
       else if (option == this.OPTIONS.OP4) this.OPTIONS_COLORS.OP4 = newColor;
       this.setState({colors: this.OPTIONS_COLORS});
     }
-  
+
     render() {
       return (
         <div>
           <Row>
             <Col xs={12} sm={6} md={3} lg={3}>
             <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
-                <Paper className="paper" id="block" elevation={1} style={{paddingBottom: "10px"}}>
+                <Paper className="paper" id="block" elevation={1} style={{paddingTop: "5px", paddingBottom: "10px"}}>
                   <Typography variant="h5" component="h3">
                     KPIs Filter
                   </Typography>
-                
+
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP1}} 
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP1}}
                       onClick={() => this.setPoints(this.OPTIONS.OP1)}>
                       {this.OPTIONS.OP1}
                     </Button>
+                  </div>
+                  <div style={{marginLeft: "25px", width: "82%"}}>
+                    <Slider
+                      style={{padding: '10px 0px'}}
+                      value={this.state.valueSlider1}
+                      aria-labelledby="label"
+                      onChange={this.setImportance}
+                    />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
                     <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP2}}
@@ -293,11 +311,27 @@ class MyHeatmap extends React.Component {
                       {this.OPTIONS.OP2}
                     </Button>
                   </div>
+                  <div style={{marginLeft: "25px", width: "82%"}}>
+                    <Slider
+                      style={{padding: '10px 0px'}}
+                      value={this.state.valueSlider2}
+                      aria-labelledby="label"
+                      onChange={this.setImportance}
+                    />
+                  </div>
                   <div style={{margin: "10px", width: "92%"}}>
                     <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP3}}
                       onClick={() => this.setPoints(this.OPTIONS.OP3)}>
                       {this.OPTIONS.OP3}
                     </Button>
+                  </div>
+                  <div style={{marginLeft: "25px", width: "82%"}}>
+                    <Slider
+                      style={{padding: '10px 0px'}}
+                      value={this.state.valueSlider3}
+                      aria-labelledby="label"
+                      onChange={this.setImportance}
+                    />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
                     <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP4}}
@@ -305,10 +339,18 @@ class MyHeatmap extends React.Component {
                       {this.OPTIONS.OP4}
                     </Button>
                   </div>
+                  <div style={{marginLeft: "25px", width: "82%"}}>
+                    <Slider
+                      style={{padding: '10px 0px'}}
+                      value={this.state.valueSlider4}
+                      aria-labelledby="label"
+                      onChange={this.setImportance}
+                    />
+                  </div>
                 </Paper>
               </div>
               <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
-                <Paper className="paper" id="block" elevation={1} style={{paddingBottom: "10px"}}>
+                <Paper className="paper" id="block" elevation={1} style={{paddingTop: "5px", paddingBottom: "10px"}}>
                   <Typography variant="h5" component="h3">
                     Overall
                   </Typography>
@@ -365,7 +407,6 @@ class MyHeatmap extends React.Component {
         </div>
       );
     }
-  
   }
 
 export default MyHeatmap;
