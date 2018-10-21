@@ -28,7 +28,7 @@ public class TouristicHomesManager {
 
     public static void getDataFromSources() throws UnirestException, IOException {
         InputStream in = Unirest.get(OPEN_DATA_URL).asString().getRawBody();
-        DecimalFormat df = new DecimalFormat("##.####");
+        DecimalFormat df = new DecimalFormat("##.######");
 
         Reader reader = new InputStreamReader(in);
         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
@@ -42,7 +42,7 @@ public class TouristicHomesManager {
                 Map<String, Object> sensor = new HashMap<>();
                 sensor.put("lat", df.format(Double.parseDouble(latitude)));
                 sensor.put("lon", df.format(Double.parseDouble(longitude)));
-                sensor.put("val", 0);
+                sensor.put("val", 1);
                 values.add(sensor);
             }
 
@@ -52,6 +52,6 @@ public class TouristicHomesManager {
     }
 
     public static Map<String, Object> getTouristicHomesData() {
-        return AWSManager.buildResponseBody("Touristic Homes", new Range(0, 0), opendataTouristicHomes);
+        return AWSManager.buildResponseBody("Touristic Homes", new Range(0, 1), opendataTouristicHomes);
     }
 }
