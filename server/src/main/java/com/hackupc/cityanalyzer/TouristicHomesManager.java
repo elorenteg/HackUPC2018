@@ -42,7 +42,7 @@ public class TouristicHomesManager {
                 Map<String, Object> sensor = new HashMap<>();
                 sensor.put("lat", df.format(Double.parseDouble(latitude)));
                 sensor.put("lon", df.format(Double.parseDouble(longitude)));
-                sensor.put("value", 0);
+                sensor.put("val", 0);
                 values.add(sensor);
             }
 

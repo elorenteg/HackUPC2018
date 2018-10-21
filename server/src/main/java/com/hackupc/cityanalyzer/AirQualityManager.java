@@ -44,7 +44,7 @@ public class AirQualityManager {
                 Map<String, Object> sensor = new HashMap<>();
                 sensor.put("lat", latitude);
                 sensor.put("lon", longitude);
-                sensor.put("value", kpiIntValue);
+                sensor.put("val", kpiIntValue);
 
                 values.add(sensor);
             }
