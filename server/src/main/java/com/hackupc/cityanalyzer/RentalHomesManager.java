@@ -22,7 +22,7 @@ public class RentalHomesManager {
     static String OPEN_DATA_URL = "http://opendata-ajuntament.barcelona.cat/data/dataset/a77103f1-f9d1-46ea-8adc-9e96c3ff1888/resource/ae529e85-4962-4326-a522-0f9c3b5fc300/download/ll2017.csv";
 
 
-    private static List<Object> meanRentalHomePrizeByNeibourhood;
+    private static List<Object> meanRentalHomePrizeByNeighbourhood;
     private static Map<String, Location> barris;
 
 
@@ -57,7 +57,7 @@ public class RentalHomesManager {
                 }
             }
 
-            meanRentalHomePrizeByNeibourhood = values;
+            meanRentalHomePrizeByNeighbourhood = values;
         } catch (ParseException | IOException | UnirestException e) {
             e.printStackTrace();
         }
@@ -82,6 +82,6 @@ public class RentalHomesManager {
     }
 
     public static Map<String, Object> getRentalPriceData() {
-        return AWSManager.buildResponseBody("Rental Mean Price", new Range(0, 1000), meanRentalHomePrizeByNeibourhood);
+        return AWSManager.buildResponseBody("Rental Mean Price", new Range(0, 1000), meanRentalHomePrizeByNeighbourhood);
     }
 }
