@@ -20,26 +20,29 @@ import "./app.css"
 class MyHeatmap extends React.Component {
     map = null;
 
-    ACTIVE_COLOR = "#3D5AFE";
-    INACTIVE_COLOR = "#283593";
+    ACTIVE_COLOR = "#00BFA5";
+    INACTIVE_COLOR = "#006064";
 
     OPTIONS = {
       OP1: "Air Quality - O3",
       OP2: "Air Quality - NO2",
       OP3: "Air Quality - PM10",
-      OP4: "Touristic Homes"
+      OP4: "Touristic Homes",
+      OP5: "Rental Mean Price"
     }
     OPTIONS_POINTS = {
       OP1: -10,
       OP2: -10,
       OP3: -10,
-      OP4: -10
+      OP4: -10,
+      OP5: -10
     }
     OPTIONS_COLORS = {
       OP1: this.INACTIVE_COLOR,
       OP2: this.INACTIVE_COLOR,
       OP3: this.INACTIVE_COLOR,
-      OP4: this.INACTIVE_COLOR
+      OP4: this.INACTIVE_COLOR,
+      OP5: this.INACTIVE_COLOR
     }
 
     // map properties
@@ -68,7 +71,8 @@ class MyHeatmap extends React.Component {
       {id: "O3",        punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
       {id: "NO2",       punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
       {id: "PM10",      punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
-      {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0}
+      {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0},
+      {id: "Rent",      punctuation: this.OPTIONS_POINTS.OP5, mean: 0}
     ];
 
     // gradient of heatmap (value to color matching)
@@ -113,7 +117,7 @@ class MyHeatmap extends React.Component {
     updateGradient(isAggregate, actKPI) {
       var gradient = this.GRADIENT_GOOD;
       if (isAggregate) gradient = this.GRADIENT_POINTS;
-      else if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(actKPI)) gradient = this.GRADIENT_BAD;
+      else if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4, this.OPTIONS.OP5].includes(actKPI)) gradient = this.GRADIENT_BAD;
       this.setState({gradient: gradient});
     }
 
@@ -182,7 +186,8 @@ class MyHeatmap extends React.Component {
             if (selected == this.OPTIONS.OP1) punctuation = this.state.punctuation.OP1;
             else if (selected == this.OPTIONS.OP2) punctuation = this.state.punctuation.OP2;
             else if (selected == this.OPTIONS.OP3) punctuation = this.state.punctuation.OP3;
-            else if (selected == this.OPTIONS.OP4) punctuation = this.state.punctuation.OP4;
+            else if (selected == this.OPTIONS.OP4) punctuation = this.state.punctuation.OP4 / 2;
+            else if (selected == this.OPTIONS.OP5) punctuation = this.state.punctuation.OP5 / 2;
 
             var points = JSON.parse(JSON.stringify(data.points))
             var min = data.scale.min;
@@ -193,8 +198,6 @@ class MyHeatmap extends React.Component {
 
             if (punctuation < 0) kpiData.scale.min = kpiData.scale.min + punctuation;
             else kpiData.scale.max = kpiData.scale.max + punctuation;
-
-            console.log(kpiData.scale);
 
             kpiData.points = kpiData.points.concat(points);
             this.updatePoints(kpiData);
@@ -209,6 +212,47 @@ class MyHeatmap extends React.Component {
       }
     }
 
+    
+
+    setPoints2(kpi) {
+      const ind = this.loadedKPIs.indexOf(kpi);
+      const kpiData = this.loadedData[ind];
+
+      var actualSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
+      const numClicks = this.numClicksKPI[ind];
+      
+      if (actualSelected >= 2) {
+        // aggregate results by punctuation
+        kpiData = {points: [], scale: {min: 0, max: 1}};
+        for (var i = 0; i < this.selectedKPIs.length; ++i) {
+          var selected = this.selectedKPIs[i];
+          ind = this.loadedKPIs.indexOf(selected);
+          var data = this.loadedData[ind];
+
+          var punctuation = -1;
+          if (selected == this.OPTIONS.OP1) punctuation = this.state.punctuation.OP1;
+          else if (selected == this.OPTIONS.OP2) punctuation = this.state.punctuation.OP2;
+          else if (selected == this.OPTIONS.OP3) punctuation = this.state.punctuation.OP3;
+          else if (selected == this.OPTIONS.OP4) punctuation = this.state.punctuation.OP4 / 5;
+          else if (selected == this.OPTIONS.OP5) punctuation = this.state.punctuation.OP5 / 5;
+
+          var points = JSON.parse(JSON.stringify(data.points))
+          var min = data.scale.min;
+          var max = data.scale.max;
+          for (var j = 0; j < points.length; ++j) {
+            points[j].val = (points[j].val - min)/(max-min) * punctuation;
+          }
+
+          if (punctuation < 0) kpiData.scale.min = kpiData.scale.min + punctuation;
+          else kpiData.scale.max = kpiData.scale.max + punctuation;
+
+          kpiData.points = kpiData.points.concat(points);
+          this.updatePoints(kpiData);
+          this.updateGradient(true, kpi);
+        }
+      }
+    }
+
     setImportance(valueSlider, value) {
       this.setState({
         valueSlider: value
@@ -217,16 +261,43 @@ class MyHeatmap extends React.Component {
 
     handleDragStop = (e, value) => { this.setPoints(this.OPTIONS.OP1) };
 
-    handleChangeOP1 = (e, value) => { this.updateSlider(0, value); };
-    handleChangeOP2 = (e, value) => { this.updateSlider(1, value); };
-    handleChangeOP3 = (e, value) => { this.updateSlider(2, value); };
-    handleChangeOP4 = (e, value) => { this.updateSlider(3, value); };
+    handleChangeOP1 = (e, value) => {
+      this.updateSlider(0, value);
+      var kpi = this.OPTIONS.OP1;
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) this.setPoints2(kpi);
+    };
+    handleChangeOP2 = (e, value) => {
+      this.updateSlider(1, value);
+      var kpi = this.OPTIONS.OP2;
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) this.setPoints2(kpi);
+    };
+    handleChangeOP3 = (e, value) => {
+      this.updateSlider(2, value);
+      var kpi = this.OPTIONS.OP3;
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) this.setPoints2(kpi);
+    };
+    handleChangeOP4 = (e, value) => {
+      this.updateSlider(3, value);
+      var kpi = this.OPTIONS.OP4;
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) this.setPoints2(kpi);
+    };
+    handleChangeOP5 = (e, value) => {
+      this.updateSlider(4, value);
+      var kpi = this.OPTIONS.OP5;
+      const isLoadedKPI = this.loadedKPIs.includes(kpi);
+      if (isLoadedKPI) this.setPoints2(kpi);
+    };
     updateSlider(id, value) {
       var points = this.state.punctuation;
       if (id == 0) points.OP1 = value;
       else if (id == 1) points.OP2 = value;
       else if (id == 2) points.OP3 = value;
       else if (id == 3) points.OP4 = value;
+      else if (id == 4) points.OP5 = value;
       this.setState({punctuation: points});
       this.rows[id].punctuation = Math.round(value);
     }
@@ -265,6 +336,7 @@ class MyHeatmap extends React.Component {
           else if (kpi === this.OPTIONS.OP2) ind = 1;
           else if (kpi === this.OPTIONS.OP3) ind = 2;
           else if (kpi === this.OPTIONS.OP4) ind = 3;
+          else if (kpi === this.OPTIONS.OP5) ind = 4;
           this.rows[ind].mean = Math.round(sum / data.values.length * 100) / 100;
           var newData = {
             points: data.values,
@@ -311,6 +383,7 @@ class MyHeatmap extends React.Component {
       else if (option == this.OPTIONS.OP2) this.OPTIONS_COLORS.OP2 = newColor;
       else if (option == this.OPTIONS.OP3) this.OPTIONS_COLORS.OP3 = newColor;
       else if (option == this.OPTIONS.OP4) this.OPTIONS_COLORS.OP4 = newColor;
+      else if (option == this.OPTIONS.OP5) this.OPTIONS_COLORS.OP5 = newColor;
       this.setState({colors: this.OPTIONS_COLORS});
     }
 
@@ -386,6 +459,21 @@ class MyHeatmap extends React.Component {
                       onChange={this.handleChangeOP4}
                     />
                   </div>
+                  <div style={{margin: "10px", width: "92%"}}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP5}}
+                      onClick={() => this.setPoints(this.OPTIONS.OP5)}>
+                      {this.OPTIONS.OP5}
+                    </Button>
+                  </div>
+                  <div style={{marginLeft: "25px", width: "82%"}}>
+                    <Slider
+                      style={{padding: '10px 0px'}}
+                      min={-10} max={10}
+                      value={this.state.punctuation.OP5}
+                      aria-labelledby="label"
+                      onChange={this.handleChangeOP5}
+                    />
+                  </div>
                 </Paper>
               </div>
               <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
@@ -431,6 +519,7 @@ class MyHeatmap extends React.Component {
                       scaleRadius={this.state.scaleRadius}
                       radius={this.getRadius()}
                       blur={this.getBlur()}
+                      min={Number.parseFloat(this.state.min)}
                       max={Number.parseFloat(this.state.max)}
                     />
                   }

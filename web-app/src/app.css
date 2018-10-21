@@ -1,9 +1,18 @@
 .leaflet-container {
     height: 700px;
-    width: 100%;
+    width: 98%;
+}
+
+.app {
+    width: 90%;
+    height: 50px;
 }
 
 #block {
     width: 100%;
     text-align: center;
+}
+
+.MuiAppBar-colorPrimary-8, .MuiSlider-thumb-125 {
+    background-color: #00838F !important;
 }
