@@ -2,12 +2,9 @@ import React from 'react';
 import { Map, TileLayer } from 'react-leaflet';
 import HeatmapLayer from './HeatmapLayer';
 
-import { points, points2, points3 } from "./data/data.js";
-
-import { Grid, Row, Col } from 'react-flexbox-grid';
+import { Row, Col } from 'react-flexbox-grid';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 
 import axios from 'axios'
@@ -52,10 +49,20 @@ class MyHeatmap extends React.Component {
     numClicksKPI = [];
 
     // gradient of heatmap (value to color matching)
-    gradient = {
-      0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
-      0.6: '#FAF3A5', 0.8: '#F5D98B', 1.0: '#DE9A96'
+    COLORS = {
+      RED: "#DE9A96",
+      ORANGE: "#F5D98B",
+      YELLOW: "#FAF3A5",
+      GREEN: "#82CEB6",
+      LIGHT_BLUE: "#96E3E6",
+      BLUE: "#89BDE0"
     };
+    GRADIENT_1_BAD = {
+      0: this.COLORS.YELLOW, 0.5: this.COLORS.ORANGE, 1.0: this.COLORS.RED
+    };
+    GRADIENT_1_GOOD = {
+      0: this.COLORS.BLUE, 0.5: this.COLORS.LIGHT_BLUE, 1.0: this.COLORS.GREEN
+    }
 
     handleToggle = value => () => {
       const { checked } = this.state;
@@ -79,7 +86,7 @@ class MyHeatmap extends React.Component {
         //console.log("Data for " + kpi + " already requested");
         const ind = this.loadedKPIs.indexOf(kpi);
         const kpiData = this.loadedData[ind];
-        console.log(kpiData);
+        //console.log(kpiData);
         
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
         const numClicks = this.numClicksKPI[ind];
@@ -117,6 +124,9 @@ class MyHeatmap extends React.Component {
         this.setState({ colors: colors });
         this.requestData(kpi);
       }
+      var gradient = this.GRADIENT_1_GOOD;
+      if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3].includes(kpi)) gradient = this.GRADIENT_1_BAD;
+      this.setState({gradient: gradient});
     }
 
     requestData(kpi) {
@@ -218,7 +228,7 @@ class MyHeatmap extends React.Component {
                       points={this.state.points}
                       longitudeExtractor={m => parseFloat(m.longitude)}
                       latitudeExtractor={m => parseFloat(m.latitude)}
-                      gradient={this.gradient}
+                      gradient={this.state.gradient}
                       intensityExtractor={m => parseFloat(m.value)}
                       scaleRadius={this.state.scaleRadius}
                       radius={this.getRadius()}
