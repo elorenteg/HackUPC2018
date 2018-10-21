@@ -6,6 +6,11 @@ import { Row, Col } from 'react-flexbox-grid';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 import axios from 'axios'
 
@@ -21,13 +26,21 @@ class MyHeatmap extends React.Component {
     OPTIONS = {
       OP1: "Air Quality - O3",
       OP2: "Air Quality - NO2",
-      OP3: "Air Quality - PM10"
+      OP3: "Air Quality - PM10",
+      OP4: "Touristic Homes"
     }
     OPTIONS_POINTS = {
       OP1: -10,
       OP2: -10,
-      OP3: -10
+      OP3: -10,
+      OP4: -10
     }
+    rows = [
+      {id: "O3",    punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
+      {id: "NO2",   punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
+      {id: "PM10",  punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
+      {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0}
+    ];
 
     // map properties
     state = {
@@ -100,7 +113,8 @@ class MyHeatmap extends React.Component {
           this.setState({
             points: []
           });
-          this.selectedKPIs.splice(ind, 1);
+          const indaux = this.selectedKPIs.indexOf(kpi);
+          this.selectedKPIs.splice(indaux, 1);
         }
         else if (numSelected == 1) {
           this.setState({
@@ -108,10 +122,17 @@ class MyHeatmap extends React.Component {
             min: kpiData.scale.min,
             max: kpiData.scale.max
           });
-          this.selectedKPIs.concat([kpi]);
+          //this.selectedKPIs.concat([kpi]);
+          if (numClicks == 1) this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
+          else {
+            const indaux = this.selectedKPIs.indexOf(kpi);
+            this.selectedKPIs.splice(indaux, 1);
+          }
         }
         else {
           // aggregate results by punctuation
+          this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
+
           this.setState({
             points: []
           });
@@ -125,8 +146,10 @@ class MyHeatmap extends React.Component {
         this.requestData(kpi);
       }
       var gradient = this.GRADIENT_1_GOOD;
-      if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3].includes(kpi)) gradient = this.GRADIENT_1_BAD;
+      if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(kpi)) gradient = this.GRADIENT_1_BAD;
       this.setState({gradient: gradient});
+
+      console.log(this.selectedKPIs);
     }
 
     requestData(kpi) {
@@ -140,15 +163,30 @@ class MyHeatmap extends React.Component {
       })
       .then(function (response) {
         var data = null;
-        if (kpi === this.OPTIONS.OP1) data = response.data.body.Items[0];
-        else if (kpi === this.OPTIONS.OP2) data = response.data.body.Items[1];
-        else if (kpi === this.OPTIONS.OP3) data = response.data.body.Items[2];
+        var ind = -1;
+        if (kpi === this.OPTIONS.OP1) ind = 0;
+        else if (kpi === this.OPTIONS.OP2) ind = 1;
+        else if (kpi === this.OPTIONS.OP3) ind = 3;
+        else if (kpi === this.OPTIONS.OP4) ind = 2;
+        data = response.data.body.Items[ind];
+        console.log(data);
+
         if (data !== null) {
+          var sum = 0;
+          var pond = 200;
           for (var i = 0; i < data.values.length; ++i) {
-            data.values[i].longitude = data.values[i].longitude.replace(",",".");
-            data.values[i].latitude = data.values[i].latitude.replace(",",".");
-            data.values[i].value = data.values[i].value*200;
+            sum = sum + data.values[i].val;
+            data.values[i].longitude = data.values[i].lon.replace(",",".");
+            data.values[i].latitude = data.values[i].lat.replace(",",".");
+            if (kpi === this.OPTIONS.OP4) pond = 20;
+            data.values[i].value = data.values[i].val*pond;
           }
+          var ind = -1;
+          if (kpi === this.OPTIONS.OP1) ind = 0;
+          else if (kpi === this.OPTIONS.OP2) ind = 1;
+          else if (kpi === this.OPTIONS.OP3) ind = 2;
+          else if (kpi === this.OPTIONS.OP4) ind = 3;
+          this.rows[ind].mean = Math.round(sum / data.values.length * 100) / 100;
           var newData = {
             points: data.values,
             scale: {
@@ -190,10 +228,10 @@ class MyHeatmap extends React.Component {
         <div>
           <Row>
             <Col xs={12} sm={6} md={3} lg={3}>
-              <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
+            <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
                 <Paper className="paper" id="block" elevation={1} style={{paddingBottom: "10px"}}>
                   <Typography variant="h5" component="h3">
-                    KPIs
+                    KPIs Filter
                   </Typography>
                 
                   <div style={{margin: "10px", width: "92%"}}>
@@ -214,10 +252,44 @@ class MyHeatmap extends React.Component {
                       {this.OPTIONS.OP3}
                     </Button>
                   </div>
+                  <div style={{margin: "10px", width: "92%"}}>
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP4]}}
+                      onClick={() => this.setPoints(this.OPTIONS.OP4)}>
+                      {this.OPTIONS.OP4}
+                    </Button>
+                  </div>
                 </Paper>
               </div>
-              <p>Selected KPI = {this.selectedKPIs}</p>
-              <p>Loaded KPIs = {this.loadedKPIs}</p>
+              <div style={{margin: "10px", width: "90%", marginLeft: "20px"}}>
+                <Paper className="paper" id="block" elevation={1} style={{paddingBottom: "10px"}}>
+                  <Typography variant="h5" component="h3">
+                    Overall
+                  </Typography>
+
+                  <Table className="table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>KPI</TableCell>
+                        <TableCell numeric>Punctuation</TableCell>
+                        <TableCell numeric>Mean</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {this.rows.map(row => {
+                        return (
+                          <TableRow key={row.id}>
+                            <TableCell>
+                              {row.id}
+                            </TableCell>
+                            <TableCell numeric>{row.punctuation}</TableCell>
+                            <TableCell numeric>{row.mean}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </Paper>
+              </div>
             </Col>
             <Col xs={6} sm={6} md={8} lg={9}>
                 <Map center={this.state.center} zoom={this.state.zoom} maxZoom={16} ref={(ref) => { this.map = ref; }} onZoomEnd={this.handleZoomEnd}>
