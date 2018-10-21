@@ -1,4 +1,4 @@
-# City Analyzer
+# Neighborgood
 
 ## Frontend - React + Leaflet
 ### How to run
