@@ -117,17 +117,20 @@ class MyHeatmap extends React.Component {
           this.selectedKPIs.splice(indaux, 1);
         }
         else if (numSelected == 1) {
+          if (numClicks == 1) {
+            this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
+          }
+          else {
+            const indaux = this.selectedKPIs.indexOf(kpi);
+            this.selectedKPIs.splice(indaux, 1);
+            ind = this.loadedKPIs.indexOf(this.selectedKPIs[0]);
+            kpiData = this.loadedData[ind];
+          }
           this.setState({
             points: kpiData.points,
             min: kpiData.scale.min,
             max: kpiData.scale.max
           });
-          //this.selectedKPIs.concat([kpi]);
-          if (numClicks == 1) this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
-          else {
-            const indaux = this.selectedKPIs.indexOf(kpi);
-            this.selectedKPIs.splice(indaux, 1);
-          }
         }
         else {
           // aggregate results by punctuation
@@ -148,8 +151,6 @@ class MyHeatmap extends React.Component {
       var gradient = this.GRADIENT_1_GOOD;
       if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(kpi)) gradient = this.GRADIENT_1_BAD;
       this.setState({gradient: gradient});
-
-      console.log(this.selectedKPIs);
     }
 
     requestData(kpi) {
@@ -158,18 +159,21 @@ class MyHeatmap extends React.Component {
         url: 'https://cxi66ge4ng.execute-api.us-east-1.amazonaws.com/prod/',
         data: {
           "httpMethod":"GET",
-          "queryStringParameters":{}
+          "queryStringParameters":{},
+          "filter": kpi
         }
       })
       .then(function (response) {
         var data = null;
+        /*
         var ind = -1;
         if (kpi === this.OPTIONS.OP1) ind = 0;
         else if (kpi === this.OPTIONS.OP2) ind = 1;
         else if (kpi === this.OPTIONS.OP3) ind = 3;
         else if (kpi === this.OPTIONS.OP4) ind = 2;
         data = response.data.body.Items[ind];
-        console.log(data);
+        */
+        data = response.data.body[0];
 
         if (data !== null) {
           var sum = 0;
