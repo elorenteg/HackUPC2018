@@ -20,6 +20,12 @@ public class ScheduledTasks {
     }
 
     @Scheduled(fixedRate = 86400000)
+    private void updateRentalPrices() throws UnirestException, IOException, ParseException {
+        RentalHomesManager.getDataFromSources();
+        AWSManager.pushDataToDynamo(RentalHomesManager.getRentalPriceData());
+    }
+
+    @Scheduled(fixedRate = 86400000)
     private void updateTouristicHomes() throws UnirestException, IOException {
         TouristicHomesManager.getDataFromSources();
         AWSManager.pushDataToDynamo(TouristicHomesManager.getTouristicHomesData());

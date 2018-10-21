@@ -1,0 +1,513 @@
+[
+  {
+    "barri": "el Raval",
+    "position": {
+      "lat": "41.3797157",
+      "lon": "2.168183900000031"
+    }
+  },
+  {
+    "barri": "el Barri Gòtic",
+    "position": {
+      "lat": "41.3819055",
+      "lon": "2.178184999999985"
+    }
+  },
+  {
+    "barri": "la Barceloneta",
+    "position": {
+      "lat": "41.3808941",
+      "lon": "2.1893853000000263"
+    }
+  },
+  {
+    "barri": "Sant Pere, Santa Caterina i la Ribera",
+    "position": {
+      "lat": "41.3868205",
+      "lon": "2.183099699999957"
+    }
+  },
+  {
+    "barri": "el Fort Pienc",
+    "position": {
+      "lat": "41.3981098",
+      "lon": "2.181871000000001"
+    }
+  },
+  {
+    "barri": "la Sagrada Família",
+    "position": {
+      "lat": "41.4036299",
+      "lon": "2.1743558000000576"
+    }
+  },
+  {
+    "barri": "la Dreta de l'Eixample",
+    "position": {
+      "lat": "41.3963097",
+      "lon": "2.1653830999999855"
+    }
+  },
+  {
+    "barri": "l'Antiga Esquerra de l'Eixample",
+    "position": {
+      "lat": "41.3885573",
+      "lon": "2.157303299999967"
+    }
+  },
+  {
+    "barri": "la Nova Esquerra de l'Eixample",
+    "position": {
+      "lat": "41.3837327",
+      "lon": "2.147479999999973"
+    }
+  },
+  {
+    "barri": "Sant Antoni",
+    "position": {
+      "lat": "38.9826357",
+      "lon": "1.3015192000000297"
+    }
+  },
+  {
+    "barri": "el Poble Sec",
+    "position": {
+      "lat": "41.3724303",
+      "lon": "2.162877799999933"
+    }
+  },
+  {
+    "barri": "la Marina del Prat Vermell",
+    "position": {
+      "lat": "41.3525378",
+      "lon": "2.141341499999953"
+    }
+  },
+  {
+    "barri": "la Marina de Port",
+    "position": {
+      "lat": "41.3588692",
+      "lon": "2.1376589000000195"
+    }
+  },
+  {
+    "barri": "la Font de la Guatlla",
+    "position": {
+      "lat": "41.3693898",
+      "lon": "2.1444106999999804"
+    }
+  },
+  {
+    "barri": "Hostafrancs",
+    "position": {
+      "lat": "41.3752223",
+      "lon": "2.1451349000000164"
+    }
+  },
+  {
+    "barri": "la Bordeta",
+    "position": {
+      "lat": "41.3676592",
+      "lon": "2.136431399999992"
+    }
+  },
+  {
+    "barri": "Sants - Badal",
+    "position": {
+      "lat": "41.3753542",
+      "lon": "2.126612600000044"
+    }
+  },
+  {
+    "barri": "Sants",
+    "position": {
+      "lat": "41.37890669999999",
+      "lon": "2.1376589000000195"
+    }
+  },
+  {
+    "barri": "les Corts",
+    "position": {
+      "lat": "41.3834895",
+      "lon": "2.116797099999985"
+    }
+  },
+  {
+    "barri": "la Maternitat i Sant Ramon",
+    "position": {
+      "lat": "41.3793585",
+      "lon": "2.1131153999999697"
+    }
+  },
+  {
+    "barri": "Pedralbes",
+    "position": {
+      "lat": "41.3903033",
+      "lon": "2.109121400000049"
+    }
+  },
+  {
+    "barri": "Vallvidrera, el Tibidabo i les Planes",
+    "position": {
+      "lat": "41.4173114",
+      "lon": "2.0910377000000153"
+    }
+  },
+  {
+    "barri": "Sarrià",
+    "position": {
+      "lat": "41.3993167",
+      "lon": "2.1341754000000037"
+    }
+  },
+  {
+    "barri": "les Tres Torres",
+    "position": {
+      "lat": "41.3977987",
+      "lon": "2.1315217000000075"
+    }
+  },
+  {
+    "barri": "Sant Gervasi - la Bonanova",
+    "position": {
+      "lat": "41.4091308",
+      "lon": "2.127839799999947"
+    }
+  },
+  {
+    "barri": "Sant Gervasi - Galvany",
+    "position": {
+      "lat": "41.3988459",
+      "lon": "2.1425692000000254"
+    }
+  },
+  {
+    "barri": "el Putxet i el Farró",
+    "position": {
+      "lat": "41.4075841",
+      "lon": "2.1437968000000183"
+    }
+  },
+  {
+    "barri": "Vallcarca i els Penitents",
+    "position": {
+      "lat": "41.415138",
+      "lon": "2.141341499999953"
+    }
+  },
+  {
+    "barri": "el Coll",
+    "position": {
+      "lat": "41.4175036",
+      "lon": "2.148707800000011"
+    }
+  },
+  {
+    "barri": "la Salut",
+    "position": {
+      "lat": "41.4124069",
+      "lon": "2.1536192999999457"
+    }
+  },
+  {
+    "barri": "la Vila de Gràcia",
+    "position": {
+      "lat": "41.4035997",
+      "lon": "2.1553129000000126"
+    }
+  },
+  {
+    "barri": "el Camp d'en Grassot i Gràcia Nova",
+    "position": {
+      "lat": "41.4046685",
+      "lon": "2.1659005000000207"
+    }
+  },
+  {
+    "barri": "el Baix Guinardó",
+    "position": {
+      "lat": "41.412131",
+      "lon": "2.16835709999998"
+    }
+  },
+  {
+    "barri": "Can Baró",
+    "position": {
+      "lat": "41.4172284",
+      "lon": "2.163444000000027"
+    }
+  },
+  {
+    "barri": "el Guinardó",
+    "position": {
+      "lat": "41.42303",
+      "lon": "2.1733699000000115"
+    }
+  },
+  {
+    "barri": "la Font d'en Fargues",
+    "position": {
+      "lat": "41.4246893",
+      "lon": "2.1659005000000207"
+    }
+  },
+  {
+    "barri": "el Carmel",
+    "position": {
+      "lat": "41.422371",
+      "lon": "2.1560752999999977"
+    }
+  },
+  {
+    "barri": "la Teixonera",
+    "position": {
+      "lat": "41.4225997",
+      "lon": "2.1437968000000183"
+    }
+  },
+  {
+    "barri": "Sant Genís dels Agudells",
+    "position": {
+      "lat": "41.424146",
+      "lon": "2.127839799999947"
+    }
+  },
+  {
+    "barri": "Montbau",
+    "position": {
+      "lat": "41.4304873",
+      "lon": "2.1438689000000295"
+    }
+  },
+  {
+    "barri": "la Vall d'Hebron",
+    "position": {
+      "lat": "41.43001460000001",
+      "lon": "2.148707800000011"
+    }
+  },
+  {
+    "barri": "la Clota",
+    "position": {
+      "lat": "41.4293091",
+      "lon": "2.1530053999999836"
+    }
+  },
+  {
+    "barri": "Horta",
+    "position": {
+      "lat": "41.4333025",
+      "lon": "2.1552859999999328"
+    }
+  },
+  {
+    "barri": "Vilapicina i la Torre Llobeta",
+    "position": {
+      "lat": "41.4289178",
+      "lon": "2.173885000000041"
+    }
+  },
+  {
+    "barri": "Porta",
+    "position": {
+      "lat": "39.9503914",
+      "lon": "-75.16106389999999"
+    }
+  },
+  {
+    "barri": "el Turó de la Peira",
+    "position": {
+      "lat": "41.4321029",
+      "lon": "2.1708138999999846"
+    }
+  },
+  {
+    "barri": "Can Peguera",
+    "position": {
+      "lat": "41.4343785",
+      "lon": "2.1662075000000414"
+    }
+  },
+  {
+    "barri": "la Guineueta",
+    "position": {
+      "lat": "41.4400621",
+      "lon": "2.1657080999999607"
+    }
+  },
+  {
+    "barri": "Canyelles",
+    "position": {
+      "lat": "41.2829335",
+      "lon": "1.7230552999999418"
+    }
+  },
+  {
+    "barri": "les Roquetes",
+    "position": {
+      "lat": "41.228714",
+      "lon": "1.7456829999999854"
+    }
+  },
+  {
+    "barri": "Verdun",
+    "position": {
+      "lat": "49.15987639999999",
+      "lon": "5.384423100000049"
+    }
+  },
+  {
+    "barri": "la Prosperitat",
+    "position": {
+      "lat": "41.4418775",
+      "lon": "2.183099699999957"
+    }
+  },
+  {
+    "barri": "la Trinitat Nova",
+    "position": {
+      "lat": "41.4518355",
+      "lon": "2.1855573000000277"
+    }
+  },
+  {
+    "barri": "Torre Baró",
+    "position": {
+      "lat": "41.45334099999999",
+      "lon": "2.17204229999993"
+    }
+  },
+  {
+    "barri": "Ciutat Meridiana",
+    "position": {
+      "lat": "41.4620238",
+      "lon": "2.175727800000004"
+    }
+  },
+  {
+    "barri": "Vallbona",
+    "position": {
+      "lat": "29.707637",
+      "lon": "-95.50016640000001"
+    }
+  },
+  {
+    "barri": "la Trinitat Vella",
+    "position": {
+      "lat": "41.4516956",
+      "lon": "2.192930799999999"
+    }
+  },
+  {
+    "barri": "Baró de Viver",
+    "position": {
+      "lat": "41.4440989",
+      "lon": "2.19784709999999"
+    }
+  },
+  {
+    "barri": "el Bon Pastor",
+    "position": {
+      "lat": "41.4365208",
+      "lon": "2.199783000000025"
+    }
+  },
+  {
+    "barri": "Sant Andreu",
+    "position": {
+      "lat": "41.4336754",
+      "lon": "2.185790200000042"
+    }
+  },
+  {
+    "barri": "la Sagrera",
+    "position": {
+      "lat": "30.0111278",
+      "lon": "-91.824682"
+    }
+  },
+  {
+    "barri": "el Congrés i els Indians",
+    "position": {
+      "lat": "41.4244117",
+      "lon": "2.180642300000045"
+    }
+  },
+  {
+    "barri": "Navas",
+    "position": {
+      "lat": "33.878141",
+      "lon": "-117.59537999999998"
+    }
+  },
+  {
+    "barri": "el Camp de l'Arpa del Clot",
+    "position": {
+      "lat": "41.4118532",
+      "lon": "2.183099699999957"
+    }
+  },
+  {
+    "barri": "el Clot",
+    "position": {
+      "lat": "41.4097037",
+      "lon": "2.1892365999999583"
+    }
+  },
+  {
+    "barri": "el Parc i la Llacuna del Poblenou",
+    "position": {
+      "lat": "41.3991986",
+      "lon": "2.1904727999999523"
+    }
+  },
+  {
+    "barri": "la Vila Olímpica del Poblenou",
+    "position": {
+      "lat": "41.3915949",
+      "lon": "2.1953889000000117"
+    }
+  },
+  {
+    "barri": "el Poblenou",
+    "position": {
+      "lat": "41.3977365",
+      "lon": "2.2015347000000247"
+    }
+  },
+  {
+    "barri": "Diagonal Mar i el Front Marítim del Poblenou",
+    "position": {
+      "lat": "41.4074666",
+      "lon": "2.216288200000008"
+    }
+  },
+  {
+    "barri": "el Besòs i el Maresme",
+    "position": {
+      "lat": "41.413747",
+      "lon": "2.2150586000000203"
+    }
+  },
+  {
+    "barri": "Provençals del Poblenou",
+    "position": {
+      "lat": "41.4114796",
+      "lon": "2.202764000000002"
+    }
+  },
+  {
+    "barri": "Sant Martí de Provençals",
+    "position": {
+      "lat": "41.4165785",
+      "lon": "2.19784709999999"
+    }
+  },
+  {
+    "barri": "la Verneda i la Pau",
+    "position": {
+      "lat": "41.42399169999999",
+      "lon": "2.202764000000002"
+    }
+  }
+]
