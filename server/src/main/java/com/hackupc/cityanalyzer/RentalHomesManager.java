@@ -40,9 +40,11 @@ public class RentalHomesManager {
 
             for (CSVRecord csvRecord : csvParser) {
                 if (csvRecord.getRecordNumber() > 2) {
-                    String barri = csvRecord.get(1);
-                    Location location = barris.get(barri);
-                    if (location == null) System.out.println(csvRecord.toString());
+                    String barriId = csvRecord.get(1).substring(0, csvRecord.get(1).indexOf('.'));
+                    Location location = barris.get(barriId);
+                    if (location == null) {
+                        System.out.println(csvRecord.toString());
+                    }
                     String priceString = csvRecord.get(2);
                     Number price = 0;
                     if (!priceString.equals("nd")) price = Math.round(format.parse(priceString).doubleValue());
@@ -71,13 +73,11 @@ public class RentalHomesManager {
         barris = new HashMap<>();
 
         for (CSVRecord record : csvParser) {
-            if (record.getRecordNumber() != 1) {
-                String barriName = record.get(4);
-                double latitude = Double.parseDouble(record.get(5));
-                double longitude = Double.parseDouble(record.get(6));
-                Location location = new Location(latitude, longitude);
-                barris.put(barriName, location);
-            }
+            String barriName = record.get(4).substring(0, record.get(4).indexOf('.'));
+            double latitude = Double.parseDouble(record.get(5));
+            double longitude = Double.parseDouble(record.get(6));
+            Location location = new Location(latitude, longitude);
+            barris.put(barriName, location);
         }
     }
 
