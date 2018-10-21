@@ -13,7 +13,8 @@ Same URL as the endpoint. Do a POST call with this values in the body as raw:
 ```json
 {
   "httpMethod": "GET",
-  "queryStringParameters": {}
+  "queryStringParameters": {},
+  "filter": "Air Quality - PM10" #Optional, don-t add if not needed.
 }
 ```
 
