@@ -35,6 +35,12 @@ class MyHeatmap extends React.Component {
       OP3: -10,
       OP4: -10
     }
+    OPTIONS_COLORS = {
+      OP1: this.INACTIVE_COLOR,
+      OP2: this.INACTIVE_COLOR,
+      OP3: this.INACTIVE_COLOR,
+      OP4: this.INACTIVE_COLOR
+    }
     rows = [
       {id: "O3",        punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
       {id: "NO2",       punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
@@ -54,7 +60,7 @@ class MyHeatmap extends React.Component {
       max: 10,
       center: [41.390744, 2.163583],
       checked: [0],
-      colors: {contaminacio: this.INACTIVE_COLOR, verds: this.INACTIVE_COLOR, contenidors: this.INACTIVE_COLOR}
+      colors: this.OPTIONS_COLORS
     };
     ponderationSelected = 1;
     selectedKPIs = [];
@@ -104,10 +110,9 @@ class MyHeatmap extends React.Component {
         
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
         const numClicks = this.numClicksKPI[ind];
-        var colors = this.state.colors;
-        if (numClicks == 1) colors[kpi] = this.ACTIVE_COLOR;
-        else colors[kpi] = this.INACTIVE_COLOR;
-        this.setState({ colors: colors });
+        var color = this.INACTIVE_COLOR;
+        if (numClicks == 1) color = this.ACTIVE_COLOR;
+        this.setColor(kpi, color);
 
         var numSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
         this.ponderationSelected =  -1;
@@ -147,9 +152,10 @@ class MyHeatmap extends React.Component {
       }
       else  {
         //console.log("Request data for " + kpi);
-        var colors = this.state.colors;
-        colors[kpi] = this.ACTIVE_COLOR;
-        this.setState({ colors: colors });
+        //var colors = this.state.colors;
+        //colors[kpi] = this.ACTIVE_COLOR;
+        //this.setState({ colors: colors });
+        this.setColor(kpi, this.ACTIVE_COLOR);
         this.requestData(kpi);
       }
       var gradient = this.GRADIENT_1_GOOD;
@@ -234,6 +240,16 @@ class MyHeatmap extends React.Component {
       //console.log("Z - " + currentZoom + " ---- " + blur);
       return (blur);
     }
+
+    setColor(option, newColor) {
+      var color = null;
+      if (option == this.OPTIONS.OP1) this.OPTIONS_COLORS.OP1 = newColor;
+      else if (option == this.OPTIONS.OP2) this.OPTIONS_COLORS.OP2 = newColor;
+      else if (option == this.OPTIONS.OP3) this.OPTIONS_COLORS.OP3 = newColor;
+      else if (option == this.OPTIONS.OP4) this.OPTIONS_COLORS.OP4 = newColor;
+      this.setState({colors: this.OPTIONS_COLORS});
+      console.log(this.state.colors);
+    }
   
     render() {
       return (
@@ -247,25 +263,25 @@ class MyHeatmap extends React.Component {
                   </Typography>
                 
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP1]}} 
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP1}} 
                       onClick={() => this.setPoints(this.OPTIONS.OP1)}>
                       {this.OPTIONS.OP1}
                     </Button>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP2]}}
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP2}}
                       onClick={() => this.setPoints(this.OPTIONS.OP2)}>
                       {this.OPTIONS.OP2}
                     </Button>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP3]}}
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP3}}
                       onClick={() => this.setPoints(this.OPTIONS.OP3)}>
                       {this.OPTIONS.OP3}
                     </Button>
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
-                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors[this.OPTIONS.OP4]}}
+                    <Button variant="contained" color="primary" id="block" style={{backgroundColor: this.state.colors.OP4}}
                       onClick={() => this.setPoints(this.OPTIONS.OP4)}>
                       {this.OPTIONS.OP4}
                     </Button>
