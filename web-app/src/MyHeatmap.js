@@ -84,20 +84,33 @@ class MyHeatmap extends React.Component {
       0: this.COLORS.BLUE, 0.5: this.COLORS.LIGHT_BLUE, 1.0: this.COLORS.GREEN
     }
 
-    handleToggle = value => () => {
-      const { checked } = this.state;
-      const currentIndex = checked.indexOf(value);
-      const newChecked = [...checked];
-  
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
-      }
-  
+    clearPoints() {
       this.setState({
-        checked: newChecked,
+        points: []
       });
+    }
+
+    updatePoints(kpiData) {
+      this.setState({
+        points: kpiData.points,
+        min: kpiData.scale.min,
+        max: kpiData.scale.max
+      });
+    }
+
+    updateColor(kpi, isActive) {
+      var color = this.INACTIVE_COLOR;
+      if (isActive) color = this.ACTIVE_COLOR;
+      this.setColor(kpi, color);
+    }
+
+    removeSelected(kpi) {
+      const ind = this.selectedKPIs.indexOf(kpi);
+      this.selectedKPIs.splice(ind, 1);
+    }
+
+    addSelected(kpi) {
+      this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
     }
 
     setPoints(kpi) {
@@ -108,54 +121,45 @@ class MyHeatmap extends React.Component {
         const kpiData = this.loadedData[ind];
         //console.log(kpiData);
         
+        var previousSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
+
         this.numClicksKPI[ind] = (this.numClicksKPI[ind] + 1)%2;
         const numClicks = this.numClicksKPI[ind];
-        var color = this.INACTIVE_COLOR;
-        if (numClicks == 1) color = this.ACTIVE_COLOR;
-        this.setColor(kpi, color);
+        this.updateColor(kpi, numClicks == 1);
 
-        var numSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
-        this.ponderationSelected =  -1;
-        if (numSelected == 0) {
-          this.setState({
-            points: []
-          });
-          const indaux = this.selectedKPIs.indexOf(kpi);
-          this.selectedKPIs.splice(indaux, 1);
+        var actualSelected = this.numClicksKPI.reduce((a, b) => a + b, 0);
+        this.ponderationSelected = -1;
+        if (actualSelected == 0) {
+          this.clearPoints();
+          this.removeSelected(kpi);
         }
-        else if (numSelected == 1) {
+        else if (actualSelected == 1) {
           if (numClicks == 1) {
-            this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
+            // current clicked is the only active
+            this.addSelected(kpi);
             if (kpi === this.OPTIONS.OP4) this.ponderationSelected = 1;
           }
           else {
-            const indaux = this.selectedKPIs.indexOf(kpi);
-            this.selectedKPIs.splice(indaux, 1);
+            // current clicked was deselected and the current active is another
+            this.removeSelected(kpi);
             if (this.selectedKPIs[0] === this.OPTIONS.OP4) this.ponderationSelected = 1;
+
+            // find current active
             ind = this.loadedKPIs.indexOf(this.selectedKPIs[0]);
             kpiData = this.loadedData[ind];
           }
-          this.setState({
-            points: kpiData.points,
-            min: kpiData.scale.min,
-            max: kpiData.scale.max
-          });
+          this.updatePoints(kpiData);
         }
         else {
           // aggregate results by punctuation
-          this.selectedKPIs = Array.from(new Set(this.selectedKPIs.concat([kpi])));
-
-          this.setState({
-            points: []
-          });
+          if (actualSelected > previousSelected) this.addSelected(kpi);
+          else this.removeSelected(kpi);
+          this.clearPoints();
         }
       }
       else  {
         //console.log("Request data for " + kpi);
-        //var colors = this.state.colors;
-        //colors[kpi] = this.ACTIVE_COLOR;
-        //this.setState({ colors: colors });
-        this.setColor(kpi, this.ACTIVE_COLOR);
+        this.updateColor(kpi, true);
         this.requestData(kpi);
       }
       var gradient = this.GRADIENT_1_GOOD;
@@ -174,16 +178,7 @@ class MyHeatmap extends React.Component {
         }
       })
       .then(function (response) {
-        var data = null;
-        /*
-        var ind = -1;
-        if (kpi === this.OPTIONS.OP1) ind = 0;
-        else if (kpi === this.OPTIONS.OP2) ind = 1;
-        else if (kpi === this.OPTIONS.OP3) ind = 3;
-        else if (kpi === this.OPTIONS.OP4) ind = 2;
-        data = response.data.body.Items[ind];
-        */
-        data = response.data.body[0];
+        var data = response.data.body[0];
 
         if (data !== null) {
           var sum = 0;
@@ -237,7 +232,6 @@ class MyHeatmap extends React.Component {
       var pond = 3;
       if (this.ponderationSelected > 0) pond = 2;
       var blur = this.state.blur * Math.pow(2, currentZoom - 12)*pond;
-      //console.log("Z - " + currentZoom + " ---- " + blur);
       return (blur);
     }
 
@@ -248,7 +242,6 @@ class MyHeatmap extends React.Component {
       else if (option == this.OPTIONS.OP3) this.OPTIONS_COLORS.OP3 = newColor;
       else if (option == this.OPTIONS.OP4) this.OPTIONS_COLORS.OP4 = newColor;
       this.setState({colors: this.OPTIONS_COLORS});
-      console.log(this.state.colors);
     }
   
     render() {
