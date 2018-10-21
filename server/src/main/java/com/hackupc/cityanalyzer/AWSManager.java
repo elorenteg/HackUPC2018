@@ -32,7 +32,7 @@ public class AWSManager {
                 .header("Content-Type", "application/json")
                 .body(json2Post)
                 .asJson();
-        System.out.println("enviado a AWS:" + jsonResponse.getStatus());
+        System.out.println("enviado a AWS: " + data2push.get("data_type") + " " + jsonResponse.getStatus());
     }
 
     static Map<String, Object> buildResponseBody(String data_type, Range range, List<Object> values) {
