@@ -154,7 +154,33 @@ class MyHeatmap extends React.Component {
           // aggregate results by punctuation
           if (actualSelected > previousSelected) this.addSelected(kpi);
           else this.removeSelected(kpi);
-          this.clearPoints();
+          //this.clearPoints();
+
+          kpiData = {points: [], scale: {min: 0, max: 1}};
+          for (var i = 0; i < this.selectedKPIs.length; ++i) {
+            var selected = this.selectedKPIs[i];
+            ind = this.loadedKPIs.indexOf(selected);
+            var data = this.loadedData[ind];
+
+            var punctuation = -1;
+            if (selected == this.OPTIONS.OP1) punctuation = this.OPTIONS_POINTS.OP1;
+            else if (selected == this.OPTIONS.OP2) punctuation = this.OPTIONS_POINTS.OP2;
+            else if (selected == this.OPTIONS.OP3) punctuation = this.OPTIONS_POINTS.OP3;
+            else if (selected == this.OPTIONS.OP4) punctuation = this.OPTIONS_POINTS.OP4;
+
+            var points = JSON.parse(JSON.stringify(data.points))
+            var min = data.scale.min;
+            var max = data.scale.max;
+            for (var j = 0; j < points.length; ++j) {
+              points[j].val = (points[j].val - min)/(max-min) * punctuation;
+            }
+
+            if (punctuation < 0) kpiData.scale.min = kpiData.scale.min + punctuation;
+            else kpiData.scale.max = kpiData.scale.max + punctuation;
+
+            kpiData.points = kpiData.points.concat(points);
+            this.updatePoints(kpiData);
+          }
         }
       }
       else  {
