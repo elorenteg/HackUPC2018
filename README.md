@@ -1,7 +1,14 @@
-## City Analyzer
+# City Analyzer
 
+## Frontend - React + Leaflet
+### How to run
 
-## Amazon Web Services
+```
+npm install
+npm run app
+```
+
+## Backend - Amazon Web Services
 ### API Gateway
 
 Base endpoint:
