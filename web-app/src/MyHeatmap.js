@@ -80,11 +80,14 @@ class MyHeatmap extends React.Component {
       LIGHT_BLUE: "#96E3E6",
       BLUE: "#89BDE0"
     };
-    GRADIENT_1_BAD = {
+    GRADIENT_BAD = {
       0: this.COLORS.YELLOW, 0.5: this.COLORS.ORANGE, 1.0: this.COLORS.RED
     };
-    GRADIENT_1_GOOD = {
+    GRADIENT_GOOD = {
       0: this.COLORS.BLUE, 0.5: this.COLORS.LIGHT_BLUE, 1.0: this.COLORS.GREEN
+    };
+    GRADIENT_POINTS = {
+      0: this.COLORS.RED, 0.5: this.COLORS.LIGHT_BLUE, 1.0: this.COLORS.GREEN
     }
 
     clearPoints() {
@@ -105,6 +108,13 @@ class MyHeatmap extends React.Component {
       var color = this.INACTIVE_COLOR;
       if (isActive) color = this.ACTIVE_COLOR;
       this.setColor(kpi, color);
+    }
+
+    updateGradient(isAggregate, actKPI) {
+      var gradient = this.GRADIENT_GOOD;
+      if (isAggregate) gradient = this.GRADIENT_POINTS;
+      else if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(actKPI)) gradient = this.GRADIENT_BAD;
+      this.setState({gradient: gradient});
     }
 
     removeSelected(kpi) {
@@ -135,12 +145,14 @@ class MyHeatmap extends React.Component {
         if (actualSelected == 0) {
           this.clearPoints();
           this.removeSelected(kpi);
+          this.updateGradient(false, kpi);
         }
         else if (actualSelected == 1) {
           if (numClicks == 1) {
             // current clicked is the only active
             this.addSelected(kpi);
             if (kpi === this.OPTIONS.OP4) this.ponderationSelected = 1;
+            this.updateGradient(false, kpi);
           }
           else {
             // current clicked was deselected and the current active is another
@@ -150,6 +162,7 @@ class MyHeatmap extends React.Component {
             // find current active
             ind = this.loadedKPIs.indexOf(this.selectedKPIs[0]);
             kpiData = this.loadedData[ind];
+            this.updateGradient(false, this.selectedKPIs[0]);
           }
           this.updatePoints(kpiData);
         }
@@ -181,8 +194,11 @@ class MyHeatmap extends React.Component {
             if (punctuation < 0) kpiData.scale.min = kpiData.scale.min + punctuation;
             else kpiData.scale.max = kpiData.scale.max + punctuation;
 
+            console.log(kpiData.scale);
+
             kpiData.points = kpiData.points.concat(points);
             this.updatePoints(kpiData);
+            this.updateGradient(true, kpi);
           }
         }
       }
@@ -191,9 +207,6 @@ class MyHeatmap extends React.Component {
         this.updateColor(kpi, true);
         this.requestData(kpi);
       }
-      var gradient = this.GRADIENT_1_GOOD;
-      if ([this.OPTIONS.OP1, this.OPTIONS.OP2, this.OPTIONS.OP3, this.OPTIONS.OP4].includes(kpi)) gradient = this.GRADIENT_1_BAD;
-      this.setState({gradient: gradient});
     }
 
     setImportance(valueSlider, value) {
@@ -201,6 +214,8 @@ class MyHeatmap extends React.Component {
         valueSlider: value
       });
     };
+
+    handleDragStop = (e, value) => { this.setPoints(this.OPTIONS.OP1) };
 
     handleChangeOP1 = (e, value) => { this.updateSlider(0, value); };
     handleChangeOP2 = (e, value) => { this.updateSlider(1, value); };
@@ -231,14 +246,20 @@ class MyHeatmap extends React.Component {
 
         if (data !== null) {
           var sum = 0;
-          var pond = 200;
+          //var pond = 200;
+          //var pond = 1;
+          var max = Math.max.apply(Math, data.values.map(function(o) { return o.val; }))
           for (var i = 0; i < data.values.length; ++i) {
             sum = sum + data.values[i].val;
-            data.values[i].longitude = data.values[i].lon.replace(",",".");
-            data.values[i].latitude = data.values[i].lat.replace(",",".");
-            if (kpi === this.OPTIONS.OP4) pond = 0.5;
-            data.values[i].value = data.values[i].val*pond;
+            data.values[i].lon = data.values[i].lon.replace(",",".");
+            data.values[i].lat = data.values[i].lat.replace(",",".");
+            //if (kpi === this.OPTIONS.OP4) pond = 0.5;
+            //data.values[i].value = data.values[i].val*pond;
+            data.values[i].val = (data.values[i].val - data.range.min)/(max-data.range.min);
+            data.values[i].val = data.values[i].val*10;
           }
+          data.range.min = 0;
+          data.range.max = 1;
           var ind = -1;
           if (kpi === this.OPTIONS.OP1) ind = 0;
           else if (kpi === this.OPTIONS.OP2) ind = 1;
@@ -317,6 +338,7 @@ class MyHeatmap extends React.Component {
                       value={this.state.punctuation.OP1}
                       aria-labelledby="label"
                       onChange={this.handleChangeOP1}
+                      onDragOver={this.handleDragStop}
                     />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
@@ -377,7 +399,6 @@ class MyHeatmap extends React.Component {
                       <TableRow>
                         <TableCell>KPI</TableCell>
                         <TableCell numeric>Punctuation</TableCell>
-                        <TableCell numeric>Mean</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -388,7 +409,6 @@ class MyHeatmap extends React.Component {
                               {row.id}
                             </TableCell>
                             <TableCell numeric>{row.punctuation}</TableCell>
-                            <TableCell numeric>{row.mean}</TableCell>
                           </TableRow>
                         );
                       })}
@@ -404,10 +424,10 @@ class MyHeatmap extends React.Component {
                       //fitBoundsOnLoad
                       //fitBoundsOnUpdate
                       points={this.state.points}
-                      longitudeExtractor={m => parseFloat(m.longitude)}
-                      latitudeExtractor={m => parseFloat(m.latitude)}
+                      longitudeExtractor={m => parseFloat(m.lon)}
+                      latitudeExtractor={m => parseFloat(m.lat)}
                       gradient={this.state.gradient}
-                      intensityExtractor={m => parseFloat(m.value)}
+                      intensityExtractor={m => parseFloat(m.val)}
                       scaleRadius={this.state.scaleRadius}
                       radius={this.getRadius()}
                       blur={this.getBlur()}
