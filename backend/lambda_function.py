@@ -1,7 +1,10 @@
 import boto3
 import json
 
-def respond(err, res=None):
+def respond(err, res=None, d_type=None):
+    if d_type:
+        res = [x for x in res['Items'] if x['data_type'] == d_type]
+    
     return {
         'statusCode': '400' if err else '200',
         'body': err.message if err else res,
@@ -30,10 +33,11 @@ def lambda_handler(event, context):
 
     operation = event['httpMethod']
     if operation in operations:
-        dynamo = boto3.resource('dynamodb').Table('HackUPC2018')
-    
-        payload = event['queryStringParameters'] if operation == 'GET' else event['body']
+        table = boto3.resource('dynamodb').Table('HackUPC2018')
         
-        return respond(None, operations[operation](dynamo, payload))
+        d_type = event.get('filter') if operation == 'GET' else None
+        payload = event.get('queryStringParameters') if operation == 'GET' else event['body']
+        
+        return respond(None, operations[operation](table, payload), d_type)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
