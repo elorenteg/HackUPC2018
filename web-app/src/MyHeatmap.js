@@ -41,12 +41,6 @@ class MyHeatmap extends React.Component {
       OP3: this.INACTIVE_COLOR,
       OP4: this.INACTIVE_COLOR
     }
-    rows = [
-      {id: "O3",        punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
-      {id: "NO2",       punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
-      {id: "PM10",      punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
-      {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0}
-    ];
 
     // map properties
     state = {
@@ -61,16 +55,21 @@ class MyHeatmap extends React.Component {
       center: [41.390744, 2.163583],
       checked: [0],
       colors: this.OPTIONS_COLORS,
-      valueSlider1: 50,
-      valueSlider2: 50,
-      valueSlider3: 50,
-      valueSlider4: 50
+      punctuation: this.OPTIONS_POINTS,
+      valueSlider: 0
     };
     ponderationSelected = 1;
     selectedKPIs = [];
     loadedKPIs = [];
     loadedData = [];
     numClicksKPI = [];
+
+    rows = [
+      {id: "O3",        punctuation: this.OPTIONS_POINTS.OP1, mean: 0},
+      {id: "NO2",       punctuation: this.OPTIONS_POINTS.OP2, mean: 0},
+      {id: "PM10",      punctuation: this.OPTIONS_POINTS.OP3, mean: 0},
+      {id: "Tourists",  punctuation: this.OPTIONS_POINTS.OP4, mean: 0}
+    ];
 
     // gradient of heatmap (value to color matching)
     COLORS = {
@@ -203,6 +202,22 @@ class MyHeatmap extends React.Component {
       });
     };
 
+    handleChangeOP1 = (e, value) => { this.updateSlider(0, value); };
+    handleChangeOP2 = (e, value) => { this.updateSlider(1, value); };
+    handleChangeOP3 = (e, value) => { this.updateSlider(2, value); };
+    handleChangeOP4 = (e, value) => { this.updateSlider(3, value); };
+    updateSlider(id, value) {
+      var points = this.state.punctuation;
+      if (id == 0) points.OP1 = value;
+      else if (id == 1) points.OP2 = value;
+      else if (id == 2) points.OP3 = value;
+      else if (id == 3) points.OP4 = value;
+      this.setState({punctuation: points});
+      this.rows[id].punctuation = Math.round(value);
+    }
+
+    
+
     requestData(kpi) {
       axios({
         method: 'post',
@@ -300,9 +315,10 @@ class MyHeatmap extends React.Component {
                   <div style={{marginLeft: "25px", width: "82%"}}>
                     <Slider
                       style={{padding: '10px 0px'}}
-                      value={this.state.valueSlider1}
+                      min={-10} max={10}
+                      value={this.state.punctuation.OP1}
                       aria-labelledby="label"
-                      onChange={this.setImportance}
+                      onChange={this.handleChangeOP1}
                     />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
@@ -314,9 +330,10 @@ class MyHeatmap extends React.Component {
                   <div style={{marginLeft: "25px", width: "82%"}}>
                     <Slider
                       style={{padding: '10px 0px'}}
-                      value={this.state.valueSlider2}
+                      min={-10} max={10}
+                      value={this.state.punctuation.OP2}
                       aria-labelledby="label"
-                      onChange={this.setImportance}
+                      onChange={this.handleChangeOP2}
                     />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
@@ -328,9 +345,10 @@ class MyHeatmap extends React.Component {
                   <div style={{marginLeft: "25px", width: "82%"}}>
                     <Slider
                       style={{padding: '10px 0px'}}
-                      value={this.state.valueSlider3}
+                      min={-10} max={10}
+                      value={this.state.punctuation.OP3}
                       aria-labelledby="label"
-                      onChange={this.setImportance}
+                      onChange={this.handleChangeOP3}
                     />
                   </div>
                   <div style={{margin: "10px", width: "92%"}}>
@@ -342,9 +360,10 @@ class MyHeatmap extends React.Component {
                   <div style={{marginLeft: "25px", width: "82%"}}>
                     <Slider
                       style={{padding: '10px 0px'}}
-                      value={this.state.valueSlider4}
+                      min={-10} max={10}
+                      value={this.state.punctuation.OP4}
                       aria-labelledby="label"
-                      onChange={this.setImportance}
+                      onChange={this.handleChangeOP4}
                     />
                   </div>
                 </Paper>
