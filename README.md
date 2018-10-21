@@ -8,12 +8,13 @@ Base endpoint:
 https://cxi66ge4ng.execute-api.us-east-1.amazonaws.com/prod/
 
 #### GET Resources
-Same URL as the endpoint. Do a POST call with this values in the body as raw:
+Same URL as the endpoint. Do a POST call with this values in the body as raw. The 'filter' is an optional field, matches with the 'data_type', empty string returns all items.
 
 ```json
 {
   "httpMethod": "GET",
-  "queryStringParameters": {}
+  "queryStringParameters": {},
+  "filter": "Air Quality - PM10"
 }
 ```
 
